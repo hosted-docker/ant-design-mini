@@ -2,6 +2,7 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  base: '/mirror/ant-mini/',
   resolve: {
     alias: {
       tests: 'tests',
