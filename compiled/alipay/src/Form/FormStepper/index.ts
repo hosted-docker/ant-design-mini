@@ -1,30 +1,36 @@
-import { FormStepperDefaultProps } from './props';
-import createComponent from '../createComponent';
-import fmtEvent from '../../_util/fmtEvent';
+import { mountComponent } from '../../_util/component';
+import { useComponentEvent } from '../../_util/hooks/useComponentEvent';
+import {
+  useHandleCustomEvent,
+  useHandleCustomEventOnly,
+} from '../../_util/hooks/useHandleCustomEvent';
+import { useFormItem } from '../use-form-item';
+import { FormStepperDefaultProps, FormStepperProps } from './props';
 
-createComponent({
-  props: FormStepperDefaultProps,
-  methods: {
-    onChange(value, e) {
-      this.emit('onChange', value);
-      if (this.props.onChange) {
-        this.props.onChange(value, fmtEvent(this.props, e));
-      }
-    },
-    onBlur(e) {
-      if (this.props.onBlur) {
-        this.props.onBlur(fmtEvent(this.props, e));
-      }
-    },
-    onFocus(e) {
-      if (this.props.onChange) {
-        this.props.onFocus(fmtEvent(this.props, e));
-      }
-    },
-    onConfirm(value, e) {
-      if (this.props.onConfirm) {
-        this.props.onConfirm(value, fmtEvent(this.props, e));
-      }
-    },
-  }
-});
+const FormStepper = (props: FormStepperProps) => {
+  const { formData, emit } = useFormItem(props);
+  const { triggerEvent, triggerEventOnly } = useComponentEvent(props);
+
+  useHandleCustomEvent('onChange', (value, e) => {
+    emit('onChange', value);
+    triggerEvent('change', value, e);
+  });
+
+  useHandleCustomEventOnly('onBlur', (e) => {
+    triggerEventOnly('blur', e);
+  });
+
+  useHandleCustomEventOnly('onFocus', (e) => {
+    triggerEventOnly('focus', e);
+  });
+
+  useHandleCustomEvent('onConfirm', (value, e) => {
+    triggerEvent('confirm', value, e);
+  });
+
+  return {
+    formData,
+  };
+};
+
+mountComponent(FormStepper, FormStepperDefaultProps);

@@ -109,6 +109,7 @@ export function miniCompiler(option: MiniProgramSourceCompileOption) {
                 file.contents = Buffer.from(res);
                 callback(null, file);
               } catch (error) {
+                console.log('compile error', file);
                 callback(error);
               }
             }
@@ -360,7 +361,7 @@ export async function compileAntdMini(watch: boolean) {
   });
 
   miniCompiler({
-    tsconfig: resolve(__dirname, '..', 'tsconfig.json'),
+    tsconfig: resolve(__dirname, '..', 'tsconfig.alipay.demo.json'),
     source: resolve(__dirname, '..', 'demo'),
     dest: resolve(__dirname, '..', 'compiled', 'alipay', 'demo'),
     watch,

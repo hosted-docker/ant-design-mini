@@ -31,7 +31,7 @@ toc: 'content'
 | indicatorStyle | 选中框样式 | string | - |  
 | indicatorClassName | 选中框的类名 | string |  - |  
 | maskClassName | 蒙层的类名 | string | - | 
-| maskClosable |  点击蒙层是否可以关闭 | boolean |false |  | 
+| maskClosable |  点击蒙层是否可以关闭 | boolean |true |  | 
 | maskStyle | 蒙层的样式 | string | - | 
 | max | 最大值 | Date | 十年后 | 
 | min | 最小值 | Date | 十年前 | 
@@ -66,7 +66,7 @@ toc: 'content'
 | indicatorStyle | 选中框样式 | string | - |  
 | indicatorClassName | 选中框的类名 | string |  - |  
 | maskClassName | 蒙层的类名 | string | - | 
-| maskClosable |  点击蒙层是否可以关闭 | boolean |false |  | 
+| maskClosable |  点击蒙层是否可以关闭 | boolean |true |  | 
 | maskStyle | 蒙层的样式 | string | - | 
 | max | 最大值 | Date | 十年后 | 
 | min | 最小值 | Date | 十年前 | 
@@ -88,3 +88,22 @@ toc: 'content'
 | onFormat | 选中值的文本显示格式 | (date: [Date,Date], dateStr: [string,string]) => string | - | 
 | onFormatLabel | 自定义每列展示的内容，默认添加年、月、日、时、分、秒单位 | (type: `year` \| `month` \| `day` \| `hour` \| `minute`, value: number) => string | - | 
 | onVisibleChange | 弹出框显示/隐藏状态变化触发 | (visible: boolean, (event:  [Event](https://opendocs.alipay.com/mini/framework/event-object)) => void | - | 
+
+
+
+## 如何获取 YYYY-MM-DD 格式的时间
+
+data picker 组件返回的时间格式为 `Date` 类型，如果需要转换为 `YYYY-MM-DD` 格式，可以使用 [dayjs](https://day.js.org/docs/zh-CN/display/format) 进行转换。
+
+```
+<date-picker onOk="handleOk" />
+```
+
+```js
+Page({
+  handleOk(date){
+    const dateStr = dayjs(date).format('YYYY-MM-DD')
+    console.log(dateStr)
+  }
+})
+```

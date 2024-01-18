@@ -4,6 +4,7 @@ import { mountComponent } from '../_util/component';
 import { useComponentEvent } from '../_util/hooks/useComponentEvent';
 import { useMixState } from '../_util/hooks/useMixState';
 import { resolveEventValue } from '../_util/platform';
+import { StepperFunctionalProps } from './props';
 import { getPrecision, getValidNumber } from './utils';
 var Stepper = function (props) {
     var _a = useMixState(props.defaultValue, {
@@ -20,16 +21,16 @@ var Stepper = function (props) {
     var toNumber = function (v) { return (v === '' ? null : Number(v)); };
     useEvent('onFocus', function (e) {
         triggerEvent('focus', toNumber(value), e);
-    }, [value]);
+    });
     useEvent('onChange', function (v, event) {
         var state = update(resolveEventValue(v));
         if (state.changed) {
             triggerEvent('change', toNumber(state.newValue), event);
         }
-    }, [value]);
+    });
     useEvent('onConfirm', function (_v, event) {
         triggerEvent('confirm', value === '' ? null : Number(value), event);
-    }, [value]);
+    });
     useEvent('onBlur', function (_v, event) {
         if (isControlled) {
             var state = update(props.value);
@@ -43,7 +44,7 @@ var Stepper = function (props) {
         else {
             triggerEvent('blur', value === '' ? null : Number(value), event);
         }
-    }, [value, props]);
+    });
     useEvent('onTap', function (e) {
         var step = props.step, disabled = props.disabled, _a = props.min, min = _a === void 0 ? -Infinity : _a, _b = props.max, max = _b === void 0 ? Infinity : _b;
         var newValue = Number(value);
@@ -74,18 +75,7 @@ var Stepper = function (props) {
             var validValue = getValidNumber(result, min, max, step, precision).value;
             triggerEvent('change', Number(validValue), e);
         }
-    }, [value, props]);
+    });
     return { mixin: { value: value } };
 };
-mountComponent(Stepper, {
-    value: null,
-    defaultValue: null,
-    precision: -1,
-    min: Number.MIN_SAFE_INTEGER,
-    max: Number.MAX_SAFE_INTEGER,
-    step: 1,
-    type: 'digit',
-    inputClassName: '',
-    inputStyle: '',
-    disabled: false,
-});
+mountComponent(Stepper, StepperFunctionalProps);

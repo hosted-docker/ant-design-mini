@@ -1,6 +1,6 @@
 import * as types from '@babel/types';
 import { ITransformContext, TransformContext } from './context';
-import { parseXmlScript, getAxmlArrowFunctionExpression } from './utils';
+import { getAxmlArrowFunctionExpression, parseXmlScript } from './utils';
 
 export function getJSXElementName(
   ctx: ITransformContext<types.JSXElement>
@@ -130,25 +130,27 @@ export function transformJSXElement(ctx: ITransformContext) {
       return transformJSXElement(ctx.extends(ctx.node.expression));
     }
     case 'LogicalExpression': {
-      if (ctx.node.operator !== '&&') {
-        throw ctx.throw(ctx.node);
+      if (ctx.node.operator === '&&') {
+        return transformJSXElement(
+          ctx.extends(ctx.node.right, {
+            [ctx.if()]: ctx.extends(ctx.node.left).toAxmlExpression(true),
+          })
+        );
       }
-      return transformJSXElement(
-        ctx.extends(ctx.node.right, {
-          [ctx.if()]: ctx.extends(ctx.node.left).toAxmlExpression(),
-        })
-      );
+      return ctx.extends(ctx.node).toAxmlExpression(true);
     }
     case 'CallExpression': {
       if (ctx.node.callee.type !== 'MemberExpression') {
         throw ctx.throw(ctx.node);
       }
+
       const callee = ctx.node.callee;
+
       if (
         !types.isIdentifier(callee.property) ||
         callee.property.name !== 'map'
       ) {
-        throw ctx.throw(ctx.node);
+        return ctx.toAxmlExpression(ctx.node);
       }
       if (ctx.node.arguments.length !== 1) {
         throw ctx.throw(ctx.node);
@@ -175,8 +177,17 @@ export function transformJSXElement(ctx: ITransformContext) {
           indexName = mapFunctionItemIndex.name;
         }
       }
+
+      let forItem = ctx.extends(callee.object).toAxmlExpression();
+
+      if (
+        types.isCallExpression(callee.object) &&
+        types.isIdentifier(callee.object.callee, { name: '$toArray' })
+      ) {
+        forItem = ctx.extends(callee.object.arguments[0]).toAxmlExpression();
+      }
       const forProps = {
-        [ctx.for()]: ctx.extends(callee.object).toAxmlExpression(),
+        [ctx.for()]: forItem,
         [ctx.forIndex()]: indexName,
         [ctx.forItem()]: itemName,
       };
@@ -204,10 +215,13 @@ export function transformJSXElement(ctx: ITransformContext) {
       return ctx.toAxmlExpression();
     }
     case 'ConditionalExpression': {
+      const isElse = ctx.extraAttr?.[ctx.else()];
       return [
         transformJSXElement(
           ctx.extends(ctx.node.consequent, {
-            [ctx.if()]: ctx.extends(ctx.node.test).toAxmlExpression(),
+            [isElse ? ctx.elseif() : ctx.if()]: ctx
+              .extends(ctx.node.test)
+              .toAxmlExpression(),
           })
         ),
         transformJSXElement(

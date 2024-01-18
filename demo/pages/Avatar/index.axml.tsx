@@ -1,9 +1,9 @@
-import { InternalData } from 'tsxml';
+import { InternalData, Component } from 'tsxml';
 import Avatar from '../../../src/Avatar/index.axml';
 import Container from '../../../src/Container/index.axml';
 import ListItem from '../../../src/List/ListItem/index.axml';
 
-export default (_, { images, sizes, item }: InternalData) => (
+export default ({ images, sizes, item }: InternalData) => (
   <Component>
     <Container title="基础用法-四种尺寸">
       {images.map((item) => (
@@ -24,12 +24,7 @@ export default (_, { images, sizes, item }: InternalData) => (
     <Container title="配合列表使用" className="container">
       <ListItem brief="Deserunt dolor ea eaque eos">
         Novalee Spicer
-        <Avatar
-          slot="image"
-          name="Novlee Spicer"
-          desc="Deserunt dolor ea eaque eos"
-          src={images[0]}
-        />
+        <Avatar slot="image" src={images[0]} />
       </ListItem>
     </Container>
 

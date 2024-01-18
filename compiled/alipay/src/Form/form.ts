@@ -122,7 +122,7 @@ class Field extends EventEmitter {
       message,
       validateTrigger
     );
-    this.ref.on((trigger, value) => {
+    this.ref.on((trigger, value, extraInfo?: any) => {
       if (trigger === 'onChange') {
         this.setValue(value);
         this.touched = true;
@@ -130,7 +130,7 @@ class Field extends EventEmitter {
       } else if (trigger === 'didUnmount') {
         this.emit('didUnmount');
       } else if (trigger === 'deriveDataFromProps') {
-        const props = this.ref.getProps();
+        const props = extraInfo ? extraInfo : this.ref.getProps();
         if (
           (value.name && value.name !== props.name) ||
           value.required !== props.required ||
@@ -243,7 +243,8 @@ class Field extends EventEmitter {
       } else if (required) {
         ruleList.push({
           required,
-          message: message,
+          // message 不允许为 null
+          message: message ?? undefined,
         });
         requiredRule = true;
       }
@@ -254,7 +255,8 @@ class Field extends EventEmitter {
       validator = new AsyncValidator({
         [name]: {
           required,
-          message: message,
+          // message 不允许为 null
+          message: message ?? undefined,
         },
       });
       requiredRule = true;
@@ -495,10 +497,6 @@ export class Form {
    * @param formConfig 表单配置项
    */
   constructor(formConfig: FormConfig = {}) {
-    const component2 = my.canIUse('component2');
-    if (!component2) {
-      throw new Error('需要使用component2');
-    }
     this.setInitialValues(formConfig.initialValues || {});
     this.setRules(formConfig.rules || {});
     this.validateMessages = formConfig.validateMessages;

@@ -1,40 +1,56 @@
-import { FormCascaderPickerDefaultProps } from './props';
-import createComponent from '../createComponent';
-import fmtEvent from '../../_util/fmtEvent';
+import { useEvent } from 'functional-mini/component';
+import { mountComponent } from '../../_util/component';
+import { useComponentEvent } from '../../_util/hooks/useComponentEvent';
+import {
+  useHandleCustomEvent,
+  useHandleCustomEventOnly,
+  useMultipleValueHandleCustomEvent,
+} from '../../_util/hooks/useHandleCustomEvent';
+import { useFormItem } from '../use-form-item';
+import {
+  FormCascaderPickerDefaultProps,
+  FormCascaderPickerProps,
+} from './props';
 
-createComponent({
-  props: FormCascaderPickerDefaultProps,
-  methods: {
-    onOk(value, option, e) {
-      this.emit('onChange', value);
-      if (this.props.onOk) {
-        this.props.onOk(value, option, fmtEvent(this.props, e));
+const FormCascaderPicker = (props: FormCascaderPickerProps) => {
+  const { formData, emit } = useFormItem(props);
+  const { triggerEventValues, triggerEventOnly, triggerEvent } =
+    useComponentEvent(props);
+
+  useMultipleValueHandleCustomEvent('onOk', (value, option, e) => {
+    emit('onChange', value);
+    triggerEventValues('ok', [value, option], e);
+  });
+
+  useMultipleValueHandleCustomEvent('onPickerChange', (value, option, e) => {
+    triggerEventValues('pickerChange', [value, option], e);
+  });
+
+  useHandleCustomEvent('onVisibleChange', (visible, e) => {
+    triggerEvent('visibleChange', visible, e);
+  });
+
+  useEvent(
+    'handleFormat',
+    (value, option) => {
+      if (props.onFormat) {
+        return props.onFormat(value, option);
       }
     },
-    onPickerChange(value, option, e) {
-      if (this.props.onPickerChange) {
-        this.props.onPickerChange(value, option, fmtEvent(this.props, e));
-      }
-    },
-    onVisibleChange(visible, e) {
-      if (this.props.onVisibleChange) {
-        this.props.onVisibleChange(visible, fmtEvent(this.props, e));
-      }
-    },
-    onFormat(value, option) {
-      if (this.props.onFormat) {
-        return this.props.onFormat(value, option);
-      }
-    },
-    onDismissPicker(e) {
-      if (this.props.onCancel) {
-        this.props.onCancel(fmtEvent(this.props, e));
-      }
-    },
-    onChange(value, options, e) {
-      if (this.props.onChange) {
-        this.props.onChange(value, options, fmtEvent(this.props, e));
-      }
-    },
-  },
-});
+    { handleResult: true }
+  );
+
+  useHandleCustomEventOnly('onDismissPicker', (e) => {
+    triggerEventOnly('cancel', e);
+  });
+
+  useMultipleValueHandleCustomEvent('onChange', (value, options, e) => {
+    triggerEventValues('change', [value, options], e);
+  });
+
+  return {
+    formData,
+  };
+};
+
+mountComponent(FormCascaderPicker, FormCascaderPickerDefaultProps);

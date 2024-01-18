@@ -1,9 +1,12 @@
 import { useEvent } from './useEvent';
-import { useLayoutUpdateEffect } from './useLayoutEffect';
+import { useComponentUpdateEffect } from './useLayoutEffect';
 import { hasValue } from './useMergedState';
 import { useSafeState as useState } from './useState';
 
-type Updater<T> = (updater: T, ignoreDestroy?: boolean) => void;
+type Updater<T> = (
+  updater: T | ((old: T) => T),
+  ignoreDestroy?: boolean
+) => void;
 
 export function useMixState<T, R = T, O = undefined>(
   defaultStateValue: T | (() => T),
@@ -19,6 +22,7 @@ export function useMixState<T, R = T, O = undefined>(
   R,
   {
     isControlled: boolean;
+    triggerUpdater: (value: (old: T) => T, option?: O) => void;
     update(
       value: T,
       option?: O
@@ -56,29 +60,50 @@ export function useMixState<T, R = T, O = undefined>(
   const state = postState(value);
   const merge = hasValue(value) && state.valid ? state.value : innerValue;
 
-  useLayoutUpdateEffect(() => {
+  useComponentUpdateEffect(() => {
     const state = postState(value);
     if (state.valid) {
       setInnerValue(state.value);
     }
   }, [value]);
 
+  const isControlled = hasValue(value);
   const triggerChange: Updater<T> = useEvent((newState, ignoreDestroy) => {
     setInnerValue(newState, ignoreDestroy);
   });
-  const isControlled = hasValue(value);
+
+  const triggerUpdate = useEvent((value, option) => {
+    const state = postState(value, option);
+    if (state.valid && state.value !== innerValue) {
+      triggerChange(state.value);
+      return { changed: true, newValue: state.value };
+    }
+    return { changed: false };
+  });
+
+  const triggerUpdater: (value: (old: T) => T, option?: O) => void = useEvent(
+    (getValue, option) => {
+      if (isControlled) {
+        getValue(merge);
+      } else {
+        triggerChange((old: T): T => {
+          const newValue = getValue(old);
+          const state = postState(newValue, option);
+          if (state.valid && state.value !== innerValue) {
+            return state.value;
+          }
+          return old;
+        });
+      }
+    }
+  );
+
   return [
     merge as unknown as R,
     {
       isControlled,
-      update(value, option) {
-        const state = postState(value, option);
-        if (state.valid && state.value !== innerValue) {
-          triggerChange(state.value);
-          return { changed: true, newValue: state.value };
-        }
-        return { changed: false };
-      },
+      update: triggerUpdate as any,
+      triggerUpdater,
     },
   ];
 }

@@ -1,5 +1,5 @@
 import { useEvent } from './useEvent';
-import { useLayoutUpdateEffect } from './useLayoutEffect';
+import { useComponentUpdateEffect } from './useLayoutEffect';
 import { hasValue } from './useMergedState';
 import { useSafeState as useState } from './useState';
 export function useMixState(defaultStateValue, option) {
@@ -29,28 +29,45 @@ export function useMixState(defaultStateValue, option) {
     }), innerValue = _c[0], setInnerValue = _c[1];
     var state = postState(value);
     var merge = hasValue(value) && state.valid ? state.value : innerValue;
-    useLayoutUpdateEffect(function () {
+    useComponentUpdateEffect(function () {
         var state = postState(value);
         if (state.valid) {
             setInnerValue(state.value);
         }
     }, [value]);
+    var isControlled = hasValue(value);
     var triggerChange = useEvent(function (newState, ignoreDestroy) {
         setInnerValue(newState, ignoreDestroy);
     });
-    var isControlled = hasValue(value);
+    var triggerUpdate = useEvent(function (value, option) {
+        var state = postState(value, option);
+        if (state.valid && state.value !== innerValue) {
+            triggerChange(state.value);
+            return { changed: true, newValue: state.value };
+        }
+        return { changed: false };
+    });
+    var triggerUpdater = useEvent(function (getValue, option) {
+        if (isControlled) {
+            getValue(merge);
+        }
+        else {
+            triggerChange(function (old) {
+                var newValue = getValue(old);
+                var state = postState(newValue, option);
+                if (state.valid && state.value !== innerValue) {
+                    return state.value;
+                }
+                return old;
+            });
+        }
+    });
     return [
         merge,
         {
             isControlled: isControlled,
-            update: function (value, option) {
-                var state = postState(value, option);
-                if (state.valid && state.value !== innerValue) {
-                    triggerChange(state.value);
-                    return { changed: true, newValue: state.value };
-                }
-                return { changed: false };
-            },
+            update: triggerUpdate,
+            triggerUpdater: triggerUpdater,
         },
     ];
 }

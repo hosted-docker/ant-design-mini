@@ -3,7 +3,7 @@ import { IBaseProps } from '../../_util/base';
 export interface ICheckboxGroupProps extends IBaseProps {
   value: string[];
   defaultValue: string[];
-  disabled: boolean;
+  disabled?: boolean;
   position: 'horizontal' | 'vertical';
   color: string;
   options: {
@@ -18,4 +18,13 @@ export const CheckboxGroupDefaultProps: Partial<ICheckboxGroupProps> = {
   options: [],
   position: 'vertical',
   defaultValue: [],
+};
+
+export const CheckboxGroupFunctionalProps: Partial<ICheckboxGroupProps> = {
+  value: null,
+  defaultValue: [],
+  disabled: false,
+  position: 'vertical',
+  color: '',
+  options: [],
 };

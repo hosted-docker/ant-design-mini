@@ -10,13 +10,23 @@ export const View = (props: Props): any => {};
 
 export const Image = (props: Props): any => {};
 
+export const PickerViewColumn = (props: Props): any => {};
+
+export const PickerView = (props: Props): any => {};
+
 export const ScrollView = (props: Props): any => {};
 
-export const Slot = (props: Props): any => {};
+type AnyProps = {
+  [key: string]: any;
+};
+
+export const Slot = (props: AnyProps): any => {};
 
 export const Block = (props: Props): any => {};
 
 export const Page = (props: Props): any => {};
+export const Swiper = (props: Props): any => {};
+export const SwiperItem = (props: Props): any => {};
 
 export const Component = (props: Props): any => {};
 
@@ -25,6 +35,8 @@ export const Button = (props: Props): any => {};
 export const Event = (...args: any[]): any => {};
 
 export const Label = (props: Props): any => {};
+export const Radio = (props: Props): any => {};
+export const RadioGroup = (props: Props): any => {};
 
 export const Checkbox = (...args: any[]): any => {};
 export const CheckboxGroup = (...args: any[]): any => {};
@@ -39,7 +51,12 @@ export type TSXMLProps<T> = Partial<
     key?: string;
     $id?: string;
     slot?: string;
+    children?: any;
   }
 >;
 
 export type InternalData = any;
+
+export function $toArray(num: number): Array<string> {
+  return [];
+}

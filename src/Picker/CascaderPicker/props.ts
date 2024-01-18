@@ -40,7 +40,7 @@ export interface ICascaderProps extends IBaseProps {
   /**
    * @description 是否禁用
    */
-  disabled: boolean;
+  disabled?: boolean;
   /**
    * @description 标题
    */
@@ -50,10 +50,35 @@ export interface ICascaderProps extends IBaseProps {
    * @default "确定"
    */
   okText: string;
+
+  /**
+   *@description 选中框样式
+   * 版本要求： 支付宝小程序基础库 1.10.0 及以上
+   */
+  indicatorStyle?: string;
+
+  /**
+   *@description 选中框类名
+   * 版本要求： 支付宝小程序基础库 1.10.0 及以上
+   */
+  indicatorClassName?: string;
+
+  /**
+   * @description 蒙层的样式。
+   * 版本要求： 支付宝小程序基础库 1.10.0 及以上
+   */
+  maskStyle?: string;
+
+  /**
+   * @description 蒙层的类名。
+   * 版本要求： 支付宝小程序基础库 1.10.0 及以上
+   */
+  maskClassName?: string;
+
   /**
    * @description 点击确认回调
    */
-  onOk: (
+  onOk?: (
     value: any[],
     selectedOptions: ICascaderOption[],
     e: Record<string, any>
@@ -61,19 +86,19 @@ export interface ICascaderProps extends IBaseProps {
   /**
    * @description 点击取消回调
    */
-  onCancel: (e: Record<string, any>) => void;
+  onCancel?: (e: Record<string, any>) => void;
   /**
    * @description 选中值的文本显示格式
    */
-  onFormat: (value: any[], selectedOptions: ICascaderOption[]) => string;
+  onFormat?: (value: any[], selectedOptions: ICascaderOption[]) => string;
   /**
    * @description 切换显示隐藏
    */
-  onVisibleChange: (visible: boolean, e: Record<string, any>) => void;
+  onVisibleChange?: (visible: boolean, e: Record<string, any>) => void;
   /**
    * @description 发生滚动即触发， 与 onChange 点击 ok 后触发不同
    */
-  onChange: (
+  onChange?: (
     value: any[],
     selectedOptions: ICascaderOption[],
     e: Record<string, any>
@@ -99,4 +124,20 @@ export const CascaderDefaultProps: Partial<ICascaderProps> = {
   cancelText: '取消',
   disabled: false,
   maskClosable: false,
+};
+
+export const CascaderFunctionalProps: Partial<ICascaderProps> = {
+  animationType: 'transform',
+  value: null,
+  defaultValue: null,
+  options: [],
+  placeholder: '请选择',
+  cancelText: '取消',
+  disabled: false,
+  title: '',
+  okText: '确定',
+  maskClosable: true,
+  popClassName: '',
+  popStyle: '',
+  onFormat: null,
 };

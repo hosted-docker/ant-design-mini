@@ -1,27 +1,26 @@
-<picker
+<ant-picker
   className="ant-date-picker"
-  popClassName="ant-date-picker-popup {{popClassName || ''}}"
-  style="{{style}}"
-  popStyle="{{popStyle}}"
+  popClassName="ant-date-picker-popup {{ popClassName || '' }}"
+  style="{{ style }}"
+  popStyle="{{ popStyle }}"
   animationType="{{ animationType }}"
-  options="{{columns}}"
-  value="{{currentValue}}"
-  disabled="{{disabled}}"
-  title="{{title}}"
-  placeholder="{{placeholder}}"
-  okText="{{okText}}"
-  cancelText="{{cancelText}}"
-  maskStyle="{{maskStyle}}"
-  maskClassName="{{maskClassName}}"
-  indicatorStyle="{{indicatorStyle}}"
-  indicatorClassName="{{indicatorClassName}}"
+  options="{{ columns }}"
+  value="{{ currentValue }}"
+  disabled="{{ disabled }}"
+  title="{{ title }}"
+  placeholder="{{ placeholder }}"
+  okText="{{ okText }}"
+  cancelText="{{ cancelText }}"
+  maskStyle="{{ maskStyle }}"
+  maskClassName="{{ maskClassName }}"
+  indicatorStyle="{{ indicatorStyle }}"
+  indicatorClassName="{{ indicatorClassName }}"
   onChange="onChange"
   onCancel="onCancel"
   onOk="onOk"
+  formattedValueText="{{ formattedValueText }}"
   onVisibleChange="onVisibleChange"
-  maskClosable="{{maskClosable}}"
-  forceUpdate="{{forceUpdate}}"
-  onFormat="onFormat">
+  maskClosable="{{ maskClosable }}">
   <slot
     name="content"
     slot="content" />
@@ -34,4 +33,4 @@
   <slot
     name="suffix"
     slot="suffix" />
-</picker>
+</ant-picker>

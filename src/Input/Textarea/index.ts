@@ -4,7 +4,7 @@ import { useComponentEvent } from '../../_util/hooks/useComponentEvent';
 import useLayoutEffect from '../../_util/hooks/useLayoutEffect';
 import { hasValue, useMergedState } from '../../_util/hooks/useMergedState';
 import { triggerRefEvent } from '../../_util/hooks/useReportRef';
-import { TextareaProps } from './props';
+import { TextareaFunctionalProps, TextareaProps } from './props';
 
 const Textarea = (props: TextareaProps) => {
   const isControlled = hasValue(props.controlled)
@@ -38,71 +38,47 @@ const Textarea = (props: TextareaProps) => {
     [props.value]
   );
 
-  useEvent(
-    'onChange',
-    (e) => {
-      const newValue = e.detail.value;
-      if (!isControlled) {
-        updateValue(newValue);
-      } else {
-        /// #if WECHAT
-        setCounter((c) => c + 1);
-        /// #endif
-      }
-      triggerEvent('change', newValue, e);
-    },
-    []
-  );
+  useEvent('onChange', (e) => {
+    const newValue = e.detail.value;
+    if (!isControlled) {
+      updateValue(newValue);
+    } else {
+      /// #if WECHAT
+      setCounter((c) => c + 1);
+      /// #endif
+    }
+    triggerEvent('change', newValue, e);
+  });
 
-  useEvent(
-    'onFocus',
-    (e) => {
-      const newValue = e.detail.value;
-      setSelfFocus(true);
-      triggerEvent('focus', newValue, e);
-    },
-    []
-  );
+  useEvent('onFocus', (e) => {
+    const newValue = e.detail.value;
+    setSelfFocus(true);
+    triggerEvent('focus', newValue, e);
+  });
 
-  useEvent(
-    'onBlur',
-    (e) => {
-      const newValue = e.detail.value;
-      setSelfFocus(false);
-      triggerEvent('blur', newValue, e);
-    },
-    []
-  );
+  useEvent('onBlur', (e) => {
+    const newValue = e.detail.value;
+    setSelfFocus(false);
+    triggerEvent('blur', newValue, e);
+  });
 
-  useEvent(
-    'onConfirm',
-    (e) => {
-      const newValue = e.detail.value;
-      triggerEvent('confirm', newValue, e);
-    },
-    []
-  );
-  useEvent(
-    'onClear',
-    (e) => {
-      if (!isControlled) {
-        updateValue('');
-      }
-      triggerEvent('change', '', e);
-    },
-    []
-  );
+  useEvent('onConfirm', (e) => {
+    const newValue = e.detail.value;
+    triggerEvent('confirm', newValue, e);
+  });
+  useEvent('onClear', (e) => {
+    if (!isControlled) {
+      updateValue('');
+    }
+    triggerEvent('change', '', e);
+  });
 
-  useEvent(
-    'update',
-    (e) => {
-      if (isControlled) {
-        return;
-      }
-      updateValue(e);
-    },
-    []
-  );
+  useEvent('update', (e) => {
+    if (isControlled) {
+      return;
+    }
+    updateValue(e);
+  });
 
   return {
     /// #if WECHAT
@@ -116,31 +92,4 @@ const Textarea = (props: TextareaProps) => {
   };
 };
 
-mountComponent<TextareaProps>(Textarea, {
-  value: null,
-  defaultValue: null,
-  placeholder: null,
-  placeholderClassName: null,
-  placeholderStyle: null,
-  autoHeight: null,
-  showCount: null,
-  allowClear: null,
-  controlled: null,
-  enableNative: false,
-  inputClassName: null,
-  disabled: null,
-  inputStyle: null,
-  focusStyle: null,
-  name: null,
-  confirmType: null,
-  focus: null,
-  confirmHold: null,
-  /// #if WECHAT
-  focusClassName: null,
-  maxLength: -1,
-  showConfirmBar: true,
-  holdKeyboard: false,
-  disableDefaultPadding: false,
-  adjustKeyboardTo: 'cursor',
-  /// #endif
-});
+mountComponent<TextareaProps>(Textarea, TextareaFunctionalProps);

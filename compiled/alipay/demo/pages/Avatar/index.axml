@@ -33,8 +33,6 @@
     Novalee Spicer
     <avatar
       slot="image"
-      name="Novlee Spicer"
-      desc="Deserunt dolor ea eaque eos"
       src="{{ images[0] }}" />
   </list-item>
 </container>

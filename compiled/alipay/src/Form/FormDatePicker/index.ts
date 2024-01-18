@@ -1,40 +1,66 @@
-import { FormDatePickerDefaultProps } from './props';
-import createComponent from '../createComponent';
-import fmtEvent from '../../_util/fmtEvent';
+import { useEvent } from 'functional-mini/component';
+import { mountComponent } from '../../_util/component';
+import { useComponentEvent } from '../../_util/hooks/useComponentEvent';
+import {
+  useHandleCustomEvent,
+  useHandleCustomEventOnly,
+  useMultipleValueHandleCustomEvent,
+} from '../../_util/hooks/useHandleCustomEvent';
+import { useFormItem } from '../use-form-item';
+import { FormDatePickerDefaultProps, FormDatePickerProps } from './props';
 
-createComponent({
-  props: FormDatePickerDefaultProps,
-  methods: {
-    onOk(date, dateStr, e) {
-      this.emit('onChange', date);
-      if (this.props.onOk) {
-        this.props.onOk(date, dateStr, fmtEvent(this.props, e));
+const FormDatePicker = (props: FormDatePickerProps) => {
+  const { formData, emit } = useFormItem(props);
+  const { triggerEventValues, triggerEventOnly, triggerEvent } =
+    useComponentEvent(props);
+
+  useMultipleValueHandleCustomEvent('onOk', (date, dateStr, e) => {
+    emit('onChange', date);
+    triggerEventValues('ok', [date, dateStr], e);
+  });
+
+  useMultipleValueHandleCustomEvent('onPickerChange', (date, dateStr, e) => {
+    triggerEventValues('pickerChange', [date, dateStr], e);
+  });
+
+  useHandleCustomEvent('onVisibleChange', (visible, e) => {
+    triggerEvent('visibleChange', visible, e);
+  });
+
+  useHandleCustomEventOnly('onDismissPicker', (e) => {
+    triggerEventOnly('dismissPicker', e);
+  });
+
+  useEvent(
+    'handleFormat',
+    (date, dateStr) => {
+      if (props.onFormat) {
+        return props.onFormat(date, dateStr);
       }
     },
-    onPickerChange(date, dateStr, e) {
-      if (this.props.onPickerChange) {
-        this.props.onPickerChange(date, dateStr, fmtEvent(this.props, e));
+    {
+      handleResult: true,
+    }
+  );
+
+  useEvent(
+    'handleFormatLabel',
+    (type, value) => {
+      if (props.onFormatLabel) {
+        return props.onFormatLabel(type, value);
       }
     },
-    onVisibleChange(visible, e) {
-      if (this.props.onVisibleChange) {
-        this.props.onVisibleChange(visible, fmtEvent(this.props, e));
-      }
-    },
-    onDismissPicker(e) {
-      if (this.props.onCancel) {
-        this.props.onDismissPicker(fmtEvent(this.props, e));
-      }
-    },
-    onFormat(date, dateStr) {
-      if (this.props.onFormat) {
-        return this.props.onFormat(date, dateStr);
-      }
-    },
-    onFormatLabel(type, value) {
-      if (this.props.onFormatLabel) {
-        return this.props.onFormatLabel(type, value);
-      }
-    },
-  },
-});
+    {
+      handleResult: true,
+    }
+  );
+
+  return {
+    formData,
+  };
+};
+
+mountComponent(
+  FormDatePicker,
+  FormDatePickerDefaultProps as FormDatePickerProps
+);

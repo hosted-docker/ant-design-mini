@@ -1,6 +1,7 @@
 export const alipay: PlatformConfig = {
   if: 'a:if',
   for: 'a:for',
+  elseif: 'a:elif',
   forItem: 'a:for-item',
   forIndex: 'a:for-index',
   forKey: 'a:key',
@@ -20,6 +21,7 @@ export const alipay: PlatformConfig = {
 export const wechat: PlatformConfig = {
   if: 'wx:if',
   for: 'wx:for',
+  elseif: 'wx:elif',
   else: 'wx:else',
   forItem: 'wx:for-item',
   forIndex: 'wx:for-index',
@@ -78,6 +80,31 @@ export const wechat: PlatformConfig = {
     'ant-popup': {
       onClose: 'bind:close',
     },
+    'ant-picker': {
+      onOk: 'bind:ok',
+      onCancel: 'bind:cancel',
+    },
+    'ant-cascader-picker': {
+      onOk: 'bind:ok',
+      onCancel: 'bind:cancel',
+    },
+    'ant-date-picker': {
+      onOk: 'bind:ok',
+      onPickerChange: 'bind:pickerchange',
+    },
+    'ant-selector': {
+      onSelectMin: 'bind:selectmin',
+      onSelectMax: 'bind:selectmax',
+    },
+    'ant-guide-tour': {
+      onCancel: 'bind:cancel',
+    },
+    uploader: {
+      onPreview: 'bind:preview',
+    },
+    'ant-range-picker': {
+      onOk: 'bind:ok',
+    },
   },
 };
 
@@ -85,6 +112,7 @@ export interface PlatformConfig {
   for: string;
   if: string;
   else: string;
+  elseif: string;
   forItem: string;
   forIndex: string;
   forKey: string;

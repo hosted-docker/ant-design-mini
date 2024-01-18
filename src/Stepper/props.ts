@@ -50,12 +50,14 @@ export interface IStepperProps extends IBaseProps {
    * @description 是否禁用
    * @default false
    */
-  disabled: boolean;
+  disabled?: boolean;
 
   /**
    * @description 输入框初始值
    */
   defaultValue: number;
+
+  focus?: boolean;
 
   /**
    *
@@ -83,4 +85,17 @@ export const StepperDefaultProps: Partial<IStepperProps> = {
   step: 1,
   disabled: false,
   type: 'digit',
+};
+
+export const StepperFunctionalProps: Partial<IStepperProps> = {
+  value: null,
+  defaultValue: null,
+  precision: -1,
+  min: Number.MIN_SAFE_INTEGER,
+  max: Number.MAX_SAFE_INTEGER,
+  step: 1,
+  type: 'digit',
+  inputClassName: '',
+  inputStyle: '',
+  disabled: false,
 };

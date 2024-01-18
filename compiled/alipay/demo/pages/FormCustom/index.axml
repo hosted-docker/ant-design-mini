@@ -13,7 +13,7 @@
   name="like"
   required
   message="需要选择"
-  options="{{likeOptions}}"
+  options="{{ likeOptions }}"
   position="vertical"
   ref="handleRef" />
 
@@ -26,15 +26,15 @@
   ref="handleRef" />
 
 <view class="buttons">
-  <button
+  <ant-button
     type="primary"
     onTap="submit"
-    class="button">
+    className="button">
     提交
-  </button>
-  <button
+  </ant-button>
+  <ant-button
     onTap="reset"
-    class="button">
+    className="button">
     重置
-  </button>
+  </ant-button>
 </view>

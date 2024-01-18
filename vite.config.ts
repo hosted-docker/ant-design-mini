@@ -5,8 +5,9 @@ export default defineConfig({
   base: '/mirror/ant-mini/',
   resolve: {
     alias: {
-      tests: 'tests',
-      'compiled-alipay': 'compiled/alipay/src',
+      tests: new URL('tests', import.meta.url).pathname,
+      'compiled-alipay': new URL('./compiled/alipay/src', import.meta.url)
+        .pathname,
     },
   },
   test: {
@@ -14,6 +15,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.ts'],
     coverage: {
+      all: false,
       provider: 'istanbul',
     },
   },

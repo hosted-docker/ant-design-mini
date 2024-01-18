@@ -1,15 +1,21 @@
-import { FormSwitchDefaultProps } from './props';
-import createComponent from '../createComponent';
-import fmtEvent from '../../_util/fmtEvent';
+import { mountComponent } from '../../_util/component';
+import { useComponentEvent } from '../../_util/hooks/useComponentEvent';
+import { useHandleCustomEvent } from '../../_util/hooks/useHandleCustomEvent';
+import { useFormItem } from '../use-form-item';
+import { FormSwitchDefaultProps, FormSwitchProps } from './props';
 
-createComponent({
-  props: FormSwitchDefaultProps,
-  methods: {
-    onChange(value, e) {
-      this.emit('onChange', value);
-      if (this.props.onChange) {
-        this.props.onChange(value, fmtEvent(this.props, e));
-      }
-    },
-  }
-});
+const FormSwitch = (props: FormSwitchProps) => {
+  const { formData, emit } = useFormItem(props);
+  const { triggerEvent } = useComponentEvent(props);
+
+  useHandleCustomEvent('onChange', (value, e) => {
+    emit('onChange', value);
+    triggerEvent('change', value, e);
+  });
+
+  return {
+    formData,
+  };
+};
+
+mountComponent(FormSwitch, FormSwitchDefaultProps);

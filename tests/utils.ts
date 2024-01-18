@@ -33,6 +33,7 @@ interface Instance {
 }
 
 export interface TestInstance {
+  ref<T>(): T;
   componentInstance(): Instance;
   getData<T = Record<string, any>>(): T;
   setProps: (props: Record<string, any>) => void;
@@ -41,7 +42,11 @@ export interface TestInstance {
   getConfig(): Record<string, any>;
 }
 
-function createInstance(config: Instance, props: Record<string, any>, my: any) {
+export function createInstance(
+  config: Instance,
+  props: Record<string, any>,
+  my: any
+) {
   const component2 =
     typeof my !== 'undefined' &&
     typeof (my as any).canIUse === 'function' &&
@@ -66,7 +71,6 @@ function createInstance(config: Instance, props: Record<string, any>, my: any) {
     methods: {
       ...config.methods,
     },
-    createSelectorQuery: my.createSelectorQuery,
     setData(data: Record<string, any>, callback: (this: Instance) => void) {
       if (shallowequal(data, instance.data)) {
         return;
@@ -139,6 +143,18 @@ function createInstance(config: Instance, props: Record<string, any>, my: any) {
   return {
     componentInstance() {
       return instance;
+    },
+    ref() {
+      const refFunc = (instance as any).ref;
+      if (typeof refFunc === 'function') {
+        return refFunc.call(instance);
+      }
+      const ref = Object.keys(instance.methods).reduce((acc: any, key) => {
+        acc[key] = (...args) => instance.methods[key].call(instance, ...args);
+        return acc;
+      }, {});
+
+      return ref;
     },
     getData() {
       return JSON.parse(JSON.stringify(instance.data));

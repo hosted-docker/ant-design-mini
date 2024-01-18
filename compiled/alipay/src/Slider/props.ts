@@ -18,7 +18,7 @@ export interface ISliderProps extends IBaseProps {
    * @description 是否禁用
    * @default false
    */
-  disabled: boolean;
+  disabled?: boolean;
 
   /**
    * @description 最大值
@@ -95,4 +95,21 @@ export const sliderDefaultProps: Partial<ISliderProps> = {
   min: 0,
   max: 100,
   step: 1,
+};
+
+export const SliderFunctionalProps: Partial<ISliderProps> = {
+  value: null,
+  defaultValue: null,
+  disabled: false,
+  max: 100,
+  min: 0,
+  range: false,
+  showNumber: false,
+  step: 1,
+  showTicks: false,
+  showTooltip: false,
+  activeLineStyle: '',
+  activeDotStyle: '',
+  activeLineClassName: '',
+  activeDotClassName: '',
 };
