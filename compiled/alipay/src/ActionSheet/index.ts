@@ -1,22 +1,18 @@
-import { ActionSheetDefaultProps } from './props';
-import fmtEvent from '../_util/fmtEvent';
-import '../_util/assert-component2';
+import { IPlatformEvent, Component, triggerEventOnly, triggerEventValues } from '../_util/simply';
+import { ActionSheetDefaultProps, IActionItem } from './props';
 
-Component({
-  props: ActionSheetDefaultProps,
-  methods: {
-    onAction(e) {
-      const { item, index } = e.target.dataset;
-      if (item?.disabled) return;
-      const { onClose, onAction } = this.props;
-      const event = fmtEvent(this.props, e);
-      onClose?.(event);
-      onAction?.(item, index, event);
-    },
-    onClose(e) {
-      const { onClose } = this.props;
-      const event = fmtEvent(this.props, e);
-      onClose?.(event);
-    },
+Component(ActionSheetDefaultProps, {
+  onAction(e: IPlatformEvent) {
+    const { item, index } = e.currentTarget.dataset as {
+      item: IActionItem,
+      index: number
+    };
+    if (item?.disabled) return;
+
+    triggerEventOnly(this, 'close', e);
+    triggerEventValues(this, 'action', [item, index], e);
   },
-});
+  onClose(e: IPlatformEvent) {
+    triggerEventOnly(this, 'close', e);
+  }
+})

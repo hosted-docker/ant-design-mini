@@ -1,7 +1,7 @@
 import { InternalData, Page } from 'tsxml';
-import ActionSheet from '../../../src/ActionSheet/index.axml';
-import Button from '../../../src/Button/index.axml';
-import Container from '../../../src/Container/index.axml';
+import AntActionSheet from '../../../src/ActionSheet/index.axml';
+import AntButton from '../../../src/Button/index.axml';
+import AntContainer from '../../../src/Container/index.axml';
 
 export default ({
   visible1,
@@ -12,22 +12,37 @@ export default ({
   actions3,
 }: InternalData) => (
   <Page>
-    <Container title="基础用法">
-      <Button onTap="handleOpenBasic" inline={true} size="large" data-index="1">
+    <AntContainer title="基础用法">
+      <AntButton
+        onTap="handleOpenBasic"
+        inline={true}
+        size="large"
+        data-index="1"
+      >
         基础用法
-      </Button>
-    </Container>
-    <Container title="选项状态">
-      <Button onTap="handleOpenBasic" inline={true} size="large" data-index="2">
+      </AntButton>
+    </AntContainer>
+    <AntContainer title="选项状态">
+      <AntButton
+        onTap="handleOpenBasic"
+        inline={true}
+        size="large"
+        data-index="2"
+      >
         危险状态&禁用状态
-      </Button>
-    </Container>
-    <Container title="带注释及icon">
-      <Button onTap="handleOpenBasic" inline={true} size="large" data-index="3">
+      </AntButton>
+    </AntContainer>
+    <AntContainer title="带注释及icon">
+      <AntButton
+        onTap="handleOpenBasic"
+        inline={true}
+        size="large"
+        data-index="3"
+      >
         带注释及icon
-      </Button>
-    </Container>
-    <ActionSheet
+      </AntButton>
+    </AntContainer>
+    <AntActionSheet
       title="请选择你要进行的操作"
       visible={visible1}
       actions={actions1}
@@ -35,7 +50,7 @@ export default ({
       onAction="handleAction"
       onClose="handleCloseBasic"
     />
-    <ActionSheet
+    <AntActionSheet
       title="请选择你要进行的操作"
       visible={visible2}
       actions={actions2}
@@ -43,7 +58,7 @@ export default ({
       onAction="handleAction"
       onClose="handleCloseBasic"
     />
-    <ActionSheet
+    <AntActionSheet
       title="请选择你要进行的操作"
       visible={visible3}
       actions={actions3}

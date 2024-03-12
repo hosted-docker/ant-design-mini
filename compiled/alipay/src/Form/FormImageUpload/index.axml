@@ -11,7 +11,8 @@
   validateStatus="{{ validateStatus }}"
   help="{{ help }}">
   <image-upload
-    fileList="{{ formData.value }}"
+    ref="handleRef"
+    defaultFileList="{{ formData.value }}"
     maxCount="{{ maxCount }}"
     imageMode="{{ imageMode }}"
     sourceType="{{ sourceType }}"
@@ -21,6 +22,11 @@
     onPreview="onPreview"
     onBeforeUpload="{{ handleBeforeUpload ? handleBeforeUpload : 'handleBeforeUpload' }}"
     onChooseImageError="onChooseImageError" />
+  <view
+    a:if="{{ !tooltip }}"
+    slot="tooltip">
+    <slot name="tooltip" />
+  </view>
   <view slot="extra">
     <slot name="extra">{{ extra }}</slot>
   </view>

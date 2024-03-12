@@ -5,7 +5,7 @@
   <view
     a:if="{{ visible }}"
     class="ant-rare-words-keyboard-modal {{ showMask ? '' : 'hide' }}"
-    onTap="onHide"
+    onTap="handleHide"
     onAppear="catchAppearModal" />
   <view class="ant-rare-words-keyboard-kb {{ visible ? '' : 'hide' }}">
     <view class="ant-rare-words-keyboard-header">

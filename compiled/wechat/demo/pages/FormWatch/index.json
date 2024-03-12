@@ -1,7 +1,7 @@
 {
-  "defaultTitle": "Form",
+  "navigationBarTitleText": "Form",
   "usingComponents": {
-    "form-input": "../../../src/Form/FormInput/index",
+    "ant-form-input": "../../../src/Form/FormInput/index",
     "ant-button": "../../../src/Button/index"
   }
 }

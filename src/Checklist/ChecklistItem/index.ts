@@ -1,10 +1,14 @@
+import { Component, triggerEvent } from '../../_util/simply';
 import { ChecklistItemDefaultProps } from './props';
 
-Component({
-  props: ChecklistItemDefaultProps,
-  methods: {
-    onChecklistItemClick() {
-      this.props.onChange(this.props.item);
-    },
-  },
-});
+Component(ChecklistItemDefaultProps, {
+  onChecklistItemClick() {
+    /// #if ALIPAY
+    triggerEvent(this, 'change', this.props.item);
+    /// #endif
+
+    /// #if WECHAT
+    triggerEvent(this, 'change', this.properties.item);
+    /// #endif
+  }
+})

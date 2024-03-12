@@ -6,6 +6,18 @@
   allowClear
   ref="handleRef" />
 <form-input
+  label="密码"
+  name="password"
+  placeholder="请输入密码"
+  allowClear
+  ref="handleRef">
+  <view slot="tooltip">
+    <ant-icon
+      onTap="showToast"
+      type="QuestionCircleOutline" />
+  </view>
+</form-input>
+<form-input
   label="地址"
   name="address"
   placeholder="请输入地址"
@@ -46,6 +58,7 @@
 <form-radio-group
   label="动物单选"
   name="animalChoose"
+  color="red"
   options="{{ radioGroupOptions }}"
   ref="handleRef" />
 <form-checkbox-group
@@ -88,3 +101,7 @@
   </ant-button>
   <ant-button onTap="reset">重置</ant-button>
 </view>
+<ant-toast
+  content="密码的自定义 tooltip"
+  visible="{{ toastShow }}"
+  onClose="handleCloseToast" />

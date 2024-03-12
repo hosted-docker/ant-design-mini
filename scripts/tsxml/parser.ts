@@ -123,6 +123,9 @@ export function transformJSXElement(ctx: ITransformContext) {
         })
       );
     }
+    case 'StringLiteral': {
+      return ctx.node.value;
+    }
     case 'JSXText': {
       return ctx.node.value;
     }
@@ -131,9 +134,12 @@ export function transformJSXElement(ctx: ITransformContext) {
     }
     case 'LogicalExpression': {
       if (ctx.node.operator === '&&') {
+        const isElse = ctx.extraAttr?.[ctx.else()];
         return transformJSXElement(
           ctx.extends(ctx.node.right, {
-            [ctx.if()]: ctx.extends(ctx.node.left).toAxmlExpression(true),
+            [isElse ? ctx.elseif() : ctx.if()]: ctx
+              .extends(ctx.node.left)
+              .toAxmlExpression(true),
           })
         );
       }
@@ -211,17 +217,39 @@ export function transformJSXElement(ctx: ITransformContext) {
     case 'BinaryExpression': {
       return ctx.toAxmlExpression();
     }
+    case 'NumericLiteral': {
+      return ctx.toAxmlExpression();
+    }
     case 'Identifier': {
       return ctx.toAxmlExpression();
     }
+    case 'TemplateLiteral': {
+      const expression = ctx.node;
+      const quasis = expression.quasis;
+      const expressions = expression.expressions;
+      const res: string[] = [];
+      for (let i = 0; i < quasis.length; i++) {
+        res.push(quasis[i].value.raw);
+        if (expressions[i]) {
+          res.push(ctx.extends(expressions[i]).toAxmlExpression(true));
+        }
+      }
+      return res.join('');
+    }
     case 'ConditionalExpression': {
+      if (
+        ctx.node.consequent.type !== 'JSXElement' &&
+        ctx.node.alternate.type !== 'JSXElement'
+      ) {
+        return ctx.toAxmlExpression();
+      }
       const isElse = ctx.extraAttr?.[ctx.else()];
       return [
         transformJSXElement(
           ctx.extends(ctx.node.consequent, {
             [isElse ? ctx.elseif() : ctx.if()]: ctx
               .extends(ctx.node.test)
-              .toAxmlExpression(),
+              .toAxmlExpression(true),
           })
         ),
         transformJSXElement(
@@ -292,13 +320,15 @@ function transformAttrExpression(ctx: ITransformContext) {
     case 'NumericLiteral':
     case 'BinaryExpression':
     case 'CallExpression': {
-      return ctx.toAxmlExpression();
+      return ctx.toAxmlExpression(true);
     }
 
     case 'ArrayExpression': {
       const result = ctx.toAxmlExpression();
       if (result.startsWith('{{ ;')) {
         return result.replace(/^\{\{ ;/, '{{ ');
+      } else {
+        return result;
       }
       break;
     }

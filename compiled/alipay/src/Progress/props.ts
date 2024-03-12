@@ -8,7 +8,7 @@ export interface IProgressBarProps extends IBaseProps {
    * @description 当前进度，范围 0-100
    * @default 0
    */
-  percent: number;
+  percent: number | string;
 
   /**
    * @description 模式
@@ -22,7 +22,7 @@ export interface IProgressBarProps extends IBaseProps {
   /**
    * @description 进度条宽度，单位px
    */
-  strokeWidth: number;
+  strokeWidth: number | string;
   /**
    * @description 状态，仅限 line
    */
@@ -48,4 +48,15 @@ export const ProgressBarDefaultProps: Partial<IProgressBarProps> = {
   speed: 6,
   width: 100,
   strokeWidth: 8,
+};
+
+export const ProgressBarFunctionalProps: Partial<IProgressBarProps> = {
+  percent: 0,
+  type: 'line',
+  width: 100,
+  strokeWidth: 8,
+  status: null,
+  strokeColor: '',
+  trailColor: '',
+  speed: 6,
 };

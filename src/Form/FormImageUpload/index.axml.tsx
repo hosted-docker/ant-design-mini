@@ -41,7 +41,8 @@ export default (
       help={help}
     >
       <ImageUpload
-        fileList={formData.value}
+        ref="handleRef"
+        defaultFileList={formData.value}
         maxCount={maxCount}
         imageMode={imageMode}
         sourceType={sourceType}
@@ -54,6 +55,11 @@ export default (
         }
         onChooseImageError="onChooseImageError"
       />
+      {!tooltip && (
+        <View slot="tooltip">
+          <Slot name="tooltip" />
+        </View>
+      )}
       <View slot="extra">
         {/* #if ALIPAY */}
         <Slot name="extra">

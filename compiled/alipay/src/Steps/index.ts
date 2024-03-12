@@ -1,6 +1,4 @@
-import { StepsDefaultProps } from './props';
-import '../_util/assert-component2';
+import { Component } from '../_util/simply';
+import { StepsFunctionalProps } from './props';
 
-Component({
-  props: StepsDefaultProps,
-});
+Component(StepsFunctionalProps);

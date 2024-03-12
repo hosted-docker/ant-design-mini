@@ -2,8 +2,8 @@ import { Component, InternalData, Slot, TSXMLProps, View } from 'tsxml';
 import { FormCascaderPickerProps } from './props';
 import arrowUtil from '../../_util/arrow.sjs';
 import FormItem from '../FormItem/index.axml';
-import CascaderPicker from '../../Picker/CascaderPicker/index.axml';
-import Icon from '../../Icon/index.axml';
+import AntCascaderPicker from '../../Picker/CascaderPicker/index.axml';
+import AntIcon from '../../Icon/index.axml';
 
 export default (
   {
@@ -50,7 +50,7 @@ export default (
       help={help}
     >
       <View>
-        <CascaderPicker
+        <AntCascaderPicker
           options={options}
           cancelText={cancelText}
           okText={okText}
@@ -77,14 +77,20 @@ export default (
           <slot name="title" slot="title"></slot>
 
           {arrowUtil.getArrow(arrow) && (
-            <Icon
+            <AntIcon
               className="ant-form-cascader-picker-arrow"
               type={arrowUtil.getArrow(arrow)}
               slot="suffix"
             />
           )}
-        </CascaderPicker>
+        </AntCascaderPicker>
       </View>
+
+      {!tooltip && (
+        <View slot="tooltip">
+          <Slot name="tooltip" />
+        </View>
+      )}
 
       <View slot="extra">
         <Slot name="extra">{extra}</Slot>

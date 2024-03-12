@@ -47,19 +47,22 @@ export default ({
 
         {/* #if ALIPAY */}
         <Slot name="image">
-          {/* #endif */}
           {image && <ImageIcon image={image} className="ant-list-item-image" />}
-          {/* #if ALIPAY */}
         </Slot>
         {/* #endif */}
       </View>
       <View class="ant-list-item-content-container">
         <View class="ant-list-item-content-title-container">
+          {/* #if WECHAT */}
+          {title ? (
+            <View class="ant-list-item-content-title">{title}</View>
+          ) : (
+            <Slot name="title"></Slot>
+          )}
+          {/* #endif */}
           {/* #if ALIPAY */}
           <Slot name="title">
-            {/* #endif */}
             {title && <View class="ant-list-item-content-title">{title}</View>}
-            {/* #if ALIPAY */}
           </Slot>
           {/* #endif */}
         </View>
@@ -67,12 +70,16 @@ export default ({
           <Slot />
         </View>
         <View class="ant-list-item-content-brief-container">
+          {/* #if WECHAT */}
+          {brief ? (
+            <View class="ant-list-item-content-brief">{brief}</View>
+          ) : (
+            <Slot name="brief"></Slot>
+          )}
+          {/* #endif */}
           {/* #if ALIPAY */}
           <Slot name="brief">
-            {/* #endif */}
-
             {brief && <View class="ant-list-item-content-brief">{brief}</View>}
-            {/* #if ALIPAY */}
           </Slot>
           {/* #endif */}
         </View>
@@ -94,13 +101,17 @@ export default ({
           {/* #endif */}
         </View>
         <View class="ant-list-item-extra-brief">
+          {/* #if WECHAT */}
+          {extraBrief ? (
+            <Block>{extraBrief}</Block>
+          ) : (
+            <Block>
+              <Slot name="extraBrief"></Slot>
+            </Block>
+          )}
+          {/* #endif */}
           {/* #if ALIPAY */}
-
-          <Slot name="extraBrief">
-            {/* #endif */}
-            {extraBrief}
-            {/* #if ALIPAY */}
-          </Slot>
+          <Slot name="extraBrief">{extraBrief}</Slot>
           {/* #endif */}
         </View>
       </View>

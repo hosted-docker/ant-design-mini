@@ -1,38 +1,22 @@
-import { ModalDefaultProps } from './props';
-import '../_util/assert-component2';
+import { Component, triggerEventOnly } from '../_util/simply';
+import { ModalFunctionalProps } from './props';
 
-Component({
-  props: ModalDefaultProps,
-  methods: {
-    onClose() {
-      const { onClose } = this.props;
-      if (onClose) {
-        onClose();
-      }
-    },
-    onMaskClose() {
-      const { onClose, maskClosable } = this.props;
-      if (maskClosable && onClose) {
-        onClose();
-      }
-    },
-    onPrimaryButtonTap() {
-      const { onPrimaryButtonTap } = this.props;
-      if (onPrimaryButtonTap) {
-        onPrimaryButtonTap();
-      }
-    },
-    onSecondaryButtonTap() {
-      const { onSecondaryButtonTap } = this.props;
-      if (onSecondaryButtonTap) {
-        onSecondaryButtonTap();
-      }
-    },
-    onCancelButtonTap() {
-      const { onCancelButtonTap } = this.props;
-      if (onCancelButtonTap) {
-        onCancelButtonTap();
-      }
-    },
+Component(ModalFunctionalProps, {
+  onClose() {
+    triggerEventOnly(this, 'close');
   },
-});
+  onMaskClose() {
+    if (this.props.maskClosable) {
+      triggerEventOnly(this, 'close');
+    }
+  },
+  onPrimaryButtonTap() {
+    triggerEventOnly(this, 'primaryButtonTap');
+  },
+  onSecondaryButtonTap() {
+    triggerEventOnly(this, 'secondaryButtonTap');
+  },
+  onCancelButtonTap() {
+    triggerEventOnly(this, 'cancelButtonTap');
+  },
+})

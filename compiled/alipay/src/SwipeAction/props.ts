@@ -1,19 +1,19 @@
 import { IBaseProps } from '../_util/base';
 interface SwipeButton {
-  text: string,
-  width?: number,
-  bgColor?: string,
-  color?: string,
-  confirmType?: '' | 'move' | 'tap',
-  confirmText?: string,
+  text: string;
+  width?: number;
+  bgColor?: string;
+  color?: string;
+  confirmType?: '' | 'move' | 'tap';
+  confirmText?: string;
 }
 interface SwipeData {
-  direction: 'right' | 'left' | '',
-  btnIdx?: number,
-  swiped?: boolean,
+  direction: 'right' | 'left' | '';
+  btnIdx?: number;
+  swiped?: boolean;
 }
 
-interface ISwipeActionProps extends IBaseProps  {
+export interface ISwipeActionProps extends IBaseProps {
   /**
    * @description 左侧滑出事件
    * @default []
@@ -28,7 +28,7 @@ interface ISwipeActionProps extends IBaseProps  {
    * @description 滑动速度
    * @default 70
    */
-  damping: number;
+  damping: number | string;
   /**
    * @description 禁止滑动
    * @default false
@@ -38,7 +38,7 @@ interface ISwipeActionProps extends IBaseProps  {
    * @description 禁止滑动
    * @default ''
    */
-  swiped: '' | 'left' | 'right';
+  swiped: '' | 'left' | 'right' | boolean;
   /**
    * @description 禁止滑动
    * @default ''
@@ -48,7 +48,7 @@ interface ISwipeActionProps extends IBaseProps  {
    * @description 弹性超出最大滑动距离自动弹回
    * @default true
    */
-  elasticity: boolean
+  elasticity: boolean;
   /**
    * @description 滑动结束
    */
@@ -71,7 +71,4 @@ export const SwipeActionDefaultProps: Partial<ISwipeActionProps> = {
   defaultSwiped: '',
   damping: 70,
   disabled: false,
-  onSwipeStart: (data, e) => {},
-  onSwipeEnd: (data, e) => {},
-  onButtonTap: (data, e) => {},
 };

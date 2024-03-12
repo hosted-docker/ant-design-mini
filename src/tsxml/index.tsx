@@ -6,6 +6,9 @@ export { Template } from './template';
 
 export const Text = (props: Props): any => {};
 
+export const MovableView = (props: Props): any => {};
+export const MovableArea = (props: Props): any => {};
+
 export const View = (props: Props): any => {};
 
 export const Image = (props: Props): any => {};
@@ -21,6 +24,8 @@ type AnyProps = {
 };
 
 export const Slot = (props: AnyProps): any => {};
+
+export const Canvas = (props: AnyProps): any => {};
 
 export const Block = (props: Props): any => {};
 
