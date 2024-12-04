@@ -1,0 +1,19 @@
+{
+  /// #if WECHAT
+  "navigationBarTitleText": "",
+  /// #endif
+
+  /// #if ALIPAY
+  "defaultTitle": "",
+  "transparentTitle": "auto",
+  "titlePenetrate": "YES",
+  /// #endif
+
+  "titleBarColor": "#ffffff",
+  "transparentTitle": "auto",
+  "usingComponents": {
+    "ant-button": "../../../src/Button/index",
+    "ant-page-container": "../../../src/PageContainer/index",
+    "ant-loading": "../../../src/Loading/index"
+  }
+}

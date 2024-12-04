@@ -1,5 +1,7 @@
 {
+  "data": undefined,
   "methods": undefined,
+  "mixins": [],
   "props": {
     "footer": "",
     "header": "",

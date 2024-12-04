@@ -1,108 +1,133 @@
-import { useEvent, useRef } from 'functional-mini/component';
-import '../_util/assert-component2';
-import { mountComponent } from '../_util/component';
-import { useComponentEvent } from '../_util/hooks/useComponentEvent';
-import { useMixState } from '../_util/hooks/useMixState';
-import { triggerRefEvent } from '../_util/hooks/useReportRef';
+import { effect } from '@preact/signals-core';
+import createValue from '../mixins/value';
 import { chooseImage } from '../_util/jsapi/choose-image';
 import {
-  File,
-  IUploaderProps,
-  LocalFile,
-  UploaderFunctionalProps,
-} from './props';
-import { useId } from 'functional-mini/compat';
+  ComponentWithSignalStoreImpl,
+  getValueFromProps,
+  triggerEvent,
+} from '../_util/simply';
+import i18nController from '../_util/store';
+import { File, LocalFile, UploaderDefaultProps } from './props';
 
-/**
- * 获取一个内部使用的 uid
- * 每次获取时自增
- */
-const useCounter = () => {
-  const counterRef = useRef(0);
-  // 使用 Date.now() 与 useId 作为前缀，防止每次前缀都相同
-  const prefix = useId() + '-' + Date.now();
-  return {
-    getCount() {
-      counterRef.current = counterRef.current + 1;
-      return `${prefix}-${counterRef.current}`;
+ComponentWithSignalStoreImpl(
+  {
+    store: () => i18nController,
+    updateHook: effect,
+    mapState: {
+      locale: ({ store }) => store.currentLocale.value,
     },
-  };
-};
+  },
+  UploaderDefaultProps,
+  {
+    async chooseImage() {
+      const [onBeforeUpload, onUpload, onChooseImageError] = getValueFromProps(
+        this,
+        ['onBeforeUpload', 'onUpload', 'onChooseImageError']
+      );
+      if (!onUpload) {
+        throw new Error('need props onUpload');
+      }
+      const fileList = this.getValue();
+      const [maxCount, sourceType] = getValueFromProps(this, [
+        'maxCount',
+        'sourceType',
+      ]);
 
-const ImageUpload = (props: IUploaderProps) => {
-  const { getCount } = useCounter();
-  const [fileList, { isControlled, update, triggerUpdater }] = useMixState(
-    props.defaultFileList,
-    {
-      value: props.fileList,
-      postState(fileList) {
-        return {
-          valid: true,
-          value: (fileList || []).map((item) => {
-            const file = {
-              ...item,
-            };
-            if (typeof item.url === 'undefined') {
-              file.url = '';
+      let localFileList: LocalFile[];
+      try {
+        const chooseImageRes = await chooseImage({
+          count:
+            typeof maxCount === 'undefined'
+              ? Infinity
+              : maxCount - fileList.length,
+          sourceType,
+        });
+        localFileList = (
+          chooseImageRes.tempFiles ||
+          chooseImageRes.tempFilePaths ||
+          chooseImageRes.apFilePaths ||
+          chooseImageRes.filePaths ||
+          []
+        )
+          .map((item) => {
+            if (typeof item === 'string') {
+              return {
+                path: item,
+              };
             }
-            if (typeof item.uid === 'undefined') {
-              file.uid = getCount();
+            if (item.path) {
+              return {
+                path: item.path,
+                size: item.size,
+              };
             }
-            if (typeof item.status === 'undefined') {
-              file.status = 'done';
-            }
-            return file;
-          }),
-        };
-      },
-    }
-  );
+          })
+          .filter((item) => !!item);
+      } catch (err) {
+        onChooseImageError(err);
+        return;
+      }
 
-  triggerRefEvent();
-  const { triggerEvent } = useComponentEvent(props);
+      if (onBeforeUpload) {
+        try {
+          const beforeUploadRes = await onBeforeUpload(localFileList);
+          if (beforeUploadRes === false) {
+            return;
+          }
+          if (Array.isArray(beforeUploadRes)) {
+            localFileList = beforeUploadRes;
+          }
+        } catch (err) {
+          return;
+        }
+      }
 
-  async function uploadFile(localFile: LocalFile) {
-    const { onUpload } = props;
+      const tasks = localFileList.map((file) => this.uploadFile(file));
+      await Promise.all(tasks);
+    },
 
-    const uid = getCount();
+    async uploadFile(localFile: LocalFile) {
+      const onUpload = getValueFromProps(this, 'onUpload');
 
-    triggerUpdater((oldFiles) => {
-      const tempFileList: File[] = [
-        ...oldFiles,
+      const uid = this.getCount();
+      const tempFileList = [
+        ...this.getValue(),
         {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-expect-error
           path: localFile.path,
           size: localFile.size,
           uid,
           status: 'uploading',
         },
       ];
-      triggerEvent('change', tempFileList);
-      return tempFileList;
-    });
-    try {
-      const url = await onUpload(localFile);
-      if (typeof url !== 'string' || !url) {
-        updateFile(uid, {
+
+      if (!this.isControlled()) {
+        this.update(tempFileList);
+      }
+
+      triggerEvent(this, 'change', tempFileList);
+
+      try {
+        const url = await onUpload(localFile);
+        if (typeof url !== 'string' || !url) {
+          this.updateFile(uid, {
+            status: 'error',
+          });
+          return;
+        }
+        this.updateFile(uid, {
+          status: 'done',
+          url,
+        });
+      } catch (err) {
+        this.updateFile(uid, {
           status: 'error',
         });
-        return;
       }
-      updateFile(uid, {
-        status: 'done',
-        url,
-      });
-    } catch (err) {
-      updateFile(uid, {
-        status: 'error',
-      });
-    }
-  }
+    },
 
-  async function updateFile(uid: string, file: Partial<File>) {
-    triggerUpdater((old) => {
-      const tempFileList = old.map((item) => {
+    updateFile(uid: string, file: Partial<File>) {
+      const fileList = this.getValue();
+      const tempFileList = fileList.map((item) => {
         if (item.uid === uid) {
           return {
             ...item,
@@ -111,103 +136,112 @@ const ImageUpload = (props: IUploaderProps) => {
         }
         return item;
       });
-      triggerEvent('change', tempFileList);
-      return tempFileList;
-    });
-  }
+      if (!this.isControlled()) {
+        this.update(tempFileList);
+      }
 
-  useEvent('chooseImage', async () => {
-    const { onBeforeUpload, onUpload, maxCount, sourceType } = props;
-    if (!onUpload || typeof onUpload !== 'function') {
-      throw new Error('need props onUpload');
-    }
-    let localFileList: LocalFile[];
-    try {
-      const chooseImageRes = await chooseImage({
-        count:
-          typeof maxCount === 'undefined'
-            ? Infinity
-            : maxCount - fileList.length,
-        sourceType,
-      });
-      localFileList = (
-        chooseImageRes.tempFiles ||
-        chooseImageRes.tempFilePaths ||
-        chooseImageRes.apFilePaths ||
-        chooseImageRes.filePaths ||
-        []
-      )
-        .map((item) => {
-          if (typeof item === 'string') {
-            return {
-              path: item,
-            };
-          }
-          if (item.path) {
-            return {
-              path: item.path,
-              size: item.size,
-            };
-          }
-        })
-        .filter((item) => !!item);
-    } catch (err) {
-      triggerEvent('chooseImageError', err);
-      return;
-    }
+      triggerEvent(this, 'change', tempFileList);
+    },
 
-    if (onBeforeUpload && typeof onBeforeUpload === 'function') {
-      try {
-        const beforeUploadRes = await onBeforeUpload(localFileList);
-        if (beforeUploadRes === false) {
+    async onRemove(e) {
+      const fileList = this.getValue();
+      const onRemove = getValueFromProps(this, 'onRemove');
+      const { uid } = e.currentTarget.dataset;
+      const file = fileList.find((item) => item.uid === uid);
+
+      if (onRemove) {
+        const result = await onRemove(file);
+        if (result === false) {
           return;
         }
-        if (Array.isArray(beforeUploadRes)) {
-          localFileList = beforeUploadRes;
-        }
-      } catch (err) {
-        return;
       }
-    }
-
-    const tasks = localFileList.map((file) => uploadFile(file));
-    await Promise.all(tasks);
-  });
-
-  useEvent('onRemove', async (e) => {
-    const { uid } = e.currentTarget.dataset;
-    const file = fileList.find((item) => item.uid === uid);
-    if (props.onRemove && typeof props.onRemove === 'function') {
-      const result = await props.onRemove(file);
-      if (result === false) {
-        return;
+      const tempFileList = fileList.filter((item) => item.uid !== uid);
+      if (!this.isControlled()) {
+        this.update(tempFileList);
       }
-    }
-    const tempFileList = fileList.filter((item) => item.uid !== uid);
-    if (!isControlled) {
-      update(tempFileList);
-    }
-    triggerEvent('change', tempFileList);
-  });
 
-  useEvent('onPreview', (e) => {
-    const { uid } = e.currentTarget.dataset;
-    const file = fileList.find((item) => item.uid === uid);
-    triggerEvent('preview', file);
-  });
-
-  useEvent('update', (e) => {
-    if (isControlled) {
-      return;
-    }
-    update(e);
-  });
-
-  return {
-    mixin: {
-      value: fileList,
+      triggerEvent(this, 'change', tempFileList);
     },
-  };
-};
 
-mountComponent(ImageUpload, UploaderFunctionalProps);
+    onPreview(e) {
+      const { uid } = e.currentTarget.dataset;
+      const fileList = this.getValue();
+      const file = fileList.find((item) => item.uid === uid);
+      triggerEvent(this, 'preview', file);
+    },
+    updateShowUploadButton() {
+      const maxCount = getValueFromProps(this, 'maxCount');
+      this.setData({
+        showUploadButton: !maxCount || this.getValue().length < maxCount,
+      });
+    },
+    count: 0,
+
+    getCount() {
+      // 使用 Date.now() 与 useId 作为前缀，防止每次前缀都相同
+      this.count = (this.count || 0) + 1;
+      // 使用 Date.now() 与 useId 作为前缀，防止每次前缀都相同
+      let id = this.id;
+      /// #if ALIPAY
+      id = this.$id;
+      /// #endif
+      const prefix = id + '-' + Date.now();
+      return `${prefix}-${this.count}`;
+    },
+  },
+  null,
+  [
+    createValue({
+      defaultValueKey: 'defaultFileList',
+      valueKey: 'fileList',
+      transformValue(fileList = []) {
+        return {
+          needUpdate: true,
+          value: (fileList || []).map((item) => {
+            const file = {
+              ...item,
+            };
+            if (typeof item.url === 'undefined') {
+              file.url = '';
+            }
+            if (typeof item.uid === 'undefined') {
+              file.uid = this.getCount();
+            }
+            if (typeof item.status === 'undefined') {
+              file.status = 'done';
+            }
+            return file;
+          }),
+        };
+      },
+    }),
+  ],
+  {
+    /// #if ALIPAY
+    didMount() {
+      this.updateShowUploadButton();
+    },
+    didUpdate(prevProps, prevData) {
+      if (!this.isEqualValue(prevData)) {
+        this.updateShowUploadButton();
+      }
+    },
+    /// #endif
+    /// #if WECHAT
+    attached() {
+      this.triggerEvent('ref', this);
+      this.updateShowUploadButton();
+      this._prevData = this.data;
+    },
+    observers: {
+      '**': function (data) {
+        const prevData = this._prevData || this.data;
+        this._prevData = { ...data };
+        if (!this.isEqualValue(prevData)) {
+          this.updateShowUploadButton();
+        }
+      },
+    },
+    /// #endif
+  }
+);

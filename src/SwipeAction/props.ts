@@ -4,6 +4,7 @@ interface SwipeButton {
   width?: number;
   bgColor?: string;
   color?: string;
+  slotName?: string;
   confirmType?: '' | 'move' | 'tap';
   confirmText?: string;
 }
@@ -71,4 +72,7 @@ export const SwipeActionDefaultProps: Partial<ISwipeActionProps> = {
   defaultSwiped: '',
   damping: 70,
   disabled: false,
+  onSwipeEnd() {},
+  onSwipeStart() {},
+  onButtonTap() {},
 };

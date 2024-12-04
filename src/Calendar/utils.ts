@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { isoWeekday } from '../_util/dayjs/iso-weekday';
-import { CellState, LocaleText, SelectionMode, CalendarValue } from './props';
+import { CalendarValue, CellState, LocaleText, SelectionMode } from './props';
 
 export function getMonthListFromRange(start: Dayjs, end: Dayjs): Dayjs[] {
   if (start.isAfter(end))
@@ -54,8 +54,11 @@ export function renderCells(
   cellsMonth: Dayjs,
   weekStartsOn: string,
   value: CalendarValue,
-  localeText: LocaleText
+  localeText: LocaleText,
+  monthRangeList: Dayjs[]
 ): CellState[] {
+  const [rangeStartDate, rangeEndDate] = monthRangeList;
+
   let rowBeginDay = 0;
   let rowEndDay = 6;
   if (weekStartsOn === 'Monday') {
@@ -64,7 +67,7 @@ export function renderCells(
   }
   const dates = getDate(cellsMonth, weekStartsOn);
   if (!value) {
-    return dates.map((d): CellState => {
+    return dates.map((d, index): CellState => {
       const isToday = dayjs().isSame(d, 'day');
       const isRowBegin =
         d.isSame(cellsMonth.startOf('month'), 'date') ||
@@ -80,6 +83,7 @@ export function renderCells(
       }
 
       return {
+        index,
         disabled: false,
         time: d.toDate().getTime(),
         date: d.get('date'),
@@ -90,6 +94,9 @@ export function renderCells(
         inThisMonth: d.month() === cellsMonth.month(),
         isRowBegin,
         isRowEnd,
+        isRange:
+          (d.isSame(rangeStartDate) || d.isAfter(rangeStartDate)) &&
+          (d.isSame(rangeEndDate) || d.isBefore(rangeEndDate)),
       };
     });
   }
@@ -105,7 +112,7 @@ export function renderCells(
     selectEnd = dayjs(value);
   }
 
-  return dates.map((d): CellState => {
+  return dates.map((d, index): CellState => {
     const isToday = dayjs().isSame(d, 'day');
     const isRowBegin =
       d.isSame(cellsMonth.startOf('month'), 'date') || d.day() === rowBeginDay;
@@ -136,6 +143,7 @@ export function renderCells(
     }
 
     return {
+      index,
       disabled: false,
       time,
       date: d.get('date'),
@@ -146,6 +154,9 @@ export function renderCells(
       inThisMonth,
       isRowBegin,
       isRowEnd,
+      isRange:
+        (d.isSame(rangeStartDate) || d.isAfter(rangeStartDate)) &&
+        (d.isSame(rangeEndDate) || d.isBefore(rangeEndDate)),
     };
   });
 }
@@ -160,4 +171,17 @@ export function getSelectionModeFromValue(
     return 'single';
   }
   return null;
+}
+
+// 获取滚动视图的元素id
+export function getScrollIntoViewId(value: CalendarValue) {
+  // 已选中时间滚动到可视区域内（微信不支持id为数字开头）
+  return `id_${
+    value &&
+    dayjs(Array.isArray(value) ? value[0] : value)
+      .startOf('d')
+      .subtract(7, 'd') // 需要定位的地方往前推7天，让已选中时间定位到中间位置
+      .toDate()
+      .getTime()
+  }`;
 }

@@ -1,5 +1,5 @@
+import equal from 'fast-deep-equal';
 import { IndexBarDefaultProps } from './props';
-import '../_util/assert-component2';
 
 Component({
   props: IndexBarDefaultProps,
@@ -15,20 +15,45 @@ Component({
     hasDefaultSlot: true,
   },
   didMount() {
-    const { defaultCurrent, items } = this.props;
-    this.initItemHeight();
-    this.initTopRange();
-    const _index = items.findIndex((u) => defaultCurrent === u.label);
-    this.setData({ currentKey: _index });
+    this.init();
   },
   didUpdate(_prop) {
     const { current, items } = this.props;
+    if (!equal(_prop.items, this.props.items)) {
+      this.init();
+    }
     if (_prop.current !== current) {
       const _index = items.findIndex((u) => current === u.label);
-      this.setData({ currentKey: _index });
+      this.setData({
+        currentKey: _index,
+      });
+      if (!this.isControlled()) {
+        this.setData({
+          touchKeyIndex: _index,
+          touchKey: current,
+        });
+      }
     }
   },
   methods: {
+    init() {
+      const { defaultCurrent, current, items } = this.props;
+      this.initItemHeight();
+      this.initTopRange();
+      const initCurrent = this.isControlled() ? current : defaultCurrent;
+      const _index = items.findIndex((u) => initCurrent === u.label);
+      this.setData({
+        currentKey: _index,
+        touchKeyIndex: _index,
+        touchKey: initCurrent,
+      });
+    },
+    isControlled(valueKey = 'current') {
+      if ('controlled' in this.props) {
+        return this.props.controlled;
+      }
+      return valueKey in this.props;
+    },
     // 初始化每个块的高度，用已计算滑动距离
     initItemHeight() {
       my.createSelectorQuery()
@@ -110,7 +135,11 @@ Component({
         newIndex = topRange.findIndex((h) => scrollTop + 1 < h);
       }
       if (currentKey !== newIndex - 1 && newIndex - 1 >= 0 && !moving) {
-        this.setData({ currentKey: newIndex - 1 });
+        this.setData({
+          currentKey: newIndex - 1,
+          touchKeyIndex: newIndex - 1,
+          touchKey: items[newIndex - 1].label,
+        });
         this.onAlphabetClick(items[newIndex - 1], newIndex - 1);
       }
     },

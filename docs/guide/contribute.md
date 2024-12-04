@@ -1,8 +1,9 @@
 ---
-toc: false
+order: 9
+toc: true
 ---
 
-## 贡献指南
+# 贡献指南
 
 ### 1. 克隆代码
 
@@ -41,6 +42,10 @@ $ npm i
 
 安装好依赖后，点击微信开发者工具中的菜单栏：“工具 --> 构建 npm”。构建完成后，项目就可以正常运行了。
 
+> 如果发现不能正常运行，可能是微信开发工具构建 npm ，将依赖打包成功一个文件，导致微信中引用依赖找不到而报错。
+
+> 如：`import duration from 'dayjs/plugin/duration'`，构建 npm 之后，`dayjs/plugin`目录 在 `miniprogram_npm` 中丢失。需要将 `dayjs/plugin` 目录手动拷贝到 `miniprogram_npm` 中，可解决。
+
 #### 在支付宝小程序开发者工具中运行
 
 直接使用支付宝小程序开发者工具打开项目根目录即可运行。
@@ -64,50 +69,20 @@ $ npm run dev:doc
 
 ## Ant Design Mini 的工程方案
 
-### 函数式组件
+### 使用支付宝 axml 语法编写视图层，并能支持编译成微信版本
 
-从 v2 版本开始，我们逐步采用“React 函数式组件”开发模式来开发小程序自定义组件，背后依托 [functional-mini](https://github.com/ant-design/functional-mini) 这个 SDK。如日历组件（参见 [Calendar/index.ts](https://github.com/ant-design/ant-design-mini/blob/master/src/Calendar/index.ts)）。
+- 编写一份代码（支持条件编译），同时生成支付宝与微信小程序视图层代码：
 
-[functional-mini](https://github.com/ant-design/functional-mini) 作为运行时 SDK，接管小程序的逻辑层代码，但并不影响视图层，为我们在项目架构复杂度和编码习惯上带来平衡。借此，函数式组件的基本特性得以运用，提升代码可维护性，如数据加工逻辑组装、hooks 逻辑复用等。
-
-欢迎你一同参与 Ant Design Mini 函数式组件开发，探索更佳的小程序工程形态。
-
-### 使用 tsx 语法编写视图层
-
-我们使用 tsx 语法编写视图层。编译器解析 tsx 语法后，生成小程序视图层代码。这意味着：
-
-- 可以用 import 语法引入其他组件，享有自定义组件类型提示：
-
-```tsx | pure
-import AntButton from '../../../src/Button/index.axml';
-
-<AntButton type="primary" onTap="handleTap">
-  主要按钮
-</AntButton>;
-```
-
-- 编写一份代码，同时生成支付宝与微信小程序视图层代码：
-
-```tsx | pure
-export default ({ a, b }: TSXMLProps<Props>) => (
-  <View>
-    {a && <Text>a</Text>}
-    {a && b && <Text>a & b</Text>}
-    {a ? <Text>a</Text> : <Text>!a</Text>}
-    {<Text class={a ? '1' : '2'}></Text>}
-    <Text class={`1 ${a ? '1' + '2' : '2'} 2`}></Text>
-  </View>
-);
-```
-
-微信小程序：
+源代码：
 
 ```xml
 <view>
-  <text wx:if="{{a}}">a</text>
-  <text wx:if="{{a && b}}">a & b</text>
-  <text wx:if="{{a}}">a</text>
-  <text wx:else>!a</text>
+  <!-- #comments if ALIPAY -->
+  <text a:if="{{a}}">a</text>
+  <text a:if="{{a && b}}">a & b</text>
+  <!-- #comments endif -->
+  <text a:if="{{a}}">a</text>
+  <text a:else>!a</text>
   <text class="{{a ? '1' : '2'}}"></text>
   <text class="1 {{a ? '1' + '2' : '2'}} 2"></text>
 </view>
@@ -121,6 +96,17 @@ export default ({ a, b }: TSXMLProps<Props>) => (
   <text a:if="{{a && b}}">a & b</text>
   <text a:if="{{a}}">a</text>
   <text a:else>!a</text>
+  <text class="{{a ? '1' : '2'}}"></text>
+  <text class="1 {{a ? '1' + '2' : '2'}} 2"></text>
+</view>
+```
+
+微信小程序：
+
+```xml
+<view>
+  <text wx:if="{{a}}">a</text>
+  <text wx:else>!a</text>
   <text class="{{a ? '1' : '2'}}"></text>
   <text class="1 {{a ? '1' + '2' : '2'}} 2"></text>
 </view>

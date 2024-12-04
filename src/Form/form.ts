@@ -8,7 +8,11 @@ import AsyncValidator, {
   ValidateError,
   ValidateMessages,
 } from 'async-validator';
+
+import set from '../_util/set';
+import get from '../_util/get';
 import { IMixin4Legacy } from '@mini-types/alipay';
+import { getValueFromProps } from '../_util/simply';
 
 export { Value, Values };
 export type Validator = (
@@ -114,7 +118,7 @@ class Field extends EventEmitter {
     this.formRules = rules;
     this.create(
       name,
-      initialValues[name],
+      get(initialValues, name),
       rules[name],
       validateMessages,
       required,
@@ -140,7 +144,7 @@ class Field extends EventEmitter {
         ) {
           this.create(
             value.name,
-            initialValues[value.name],
+            get(initialValues, value.name),
             this.formRules[value.name],
             validateMessages,
             value.required,
@@ -608,12 +612,7 @@ export class Form {
             });
           }
           this.changeListeners.forEach((item) =>
-            item(
-              {
-                [name]: value,
-              },
-              this.getFieldsValue()
-            )
+            item(set({}, name, value), this.getFieldsValue())
           );
         }
       })
@@ -659,8 +658,8 @@ export class Form {
    * @param value 表单初始值
    */
   setFieldsValue(values: Values) {
-    Object.keys(values).forEach((name) => {
-      this.setFieldValue(name, values[name]);
+    Object.keys(this.fields).forEach((name) => {
+      this.setFieldValue(name, get(values, name));
     });
   }
 
@@ -700,7 +699,7 @@ export class Form {
     const fieldsValue: Values = {};
     nameList = nameList || Object.keys(this.fields);
     nameList.forEach((name) => {
-      fieldsValue[name] = this.getFieldValue(name);
+      set(fieldsValue, name, this.getFieldValue(name));
     });
     return fieldsValue;
   }
@@ -782,8 +781,8 @@ export class Form {
     callback: (value: Value, allValues: Values) => void
   ) {
     this.changeListeners.push((changedValues: Values, allValues: Values) => {
-      if (name in changedValues) {
-        callback(changedValues[name], allValues);
+      if (get(changedValues, name)) {
+        callback(get(changedValues, name), allValues);
       }
     });
   }
@@ -835,7 +834,7 @@ export class Form {
           errors: validatorStatus.errors,
         });
       }
-      values[name] = value;
+      set(values, name, value);
     });
     if (errorFields.length > 0) {
       throw {
@@ -851,14 +850,14 @@ export class Form {
    */
   reset() {
     this.eachField((field, name) => {
-      const initialValue = this.initialValues[name];
+      const initialValue = get(this.initialValues, name);
       field.reset(initialValue);
     });
   }
 }
 
 export function createForm({ methods = {} } = {}) {
-  return {
+  let mixin = {
     data: {
       formData: {
         value: undefined,
@@ -866,12 +865,28 @@ export function createForm({ methods = {} } = {}) {
         errors: [],
       },
     },
+
+    /// #if ALIPAY
     didUnmount() {
       this.emit('didUnmount');
     },
     deriveDataFromProps(nextProps) {
       this.emit('deriveDataFromProps', nextProps);
     },
+    /// #endif
+    /// #if WECHAT
+    attached() {
+      this.triggerEvent('ref', this);
+    },
+    detached() {
+      this.emit('didUnmount');
+    },
+    observers: {
+      '**': function (nextProps) {
+        this.emit('deriveDataFromProps', nextProps);
+      },
+    },
+    /// #endif
     methods: {
       emit(trigger: EventTrigger, value?: Value) {},
       setFormData(values: Values) {
@@ -890,7 +905,7 @@ export function createForm({ methods = {} } = {}) {
         this.emit = callback;
       },
       getProps() {
-        return this.props;
+        return getValueFromProps(this);
       },
       ...methods,
     },
@@ -911,4 +926,10 @@ export function createForm({ methods = {} } = {}) {
       getProps: Record<string, any>;
     }
   >;
+  /// #if WECHAT
+  // @ts-ignore
+  mixin = Behavior(mixin);
+  /// #endif
+
+  return mixin;
 }

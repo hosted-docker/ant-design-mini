@@ -23,7 +23,7 @@ export type InputType =
 
 export interface InputProps extends IBaseProps {
   type?: InputType;
-  value: string;
+  value?: string;
   defaultValue: string;
   placeholder: string;
   placeholderClassName: string;
@@ -91,9 +91,7 @@ export interface InputProps extends IBaseProps {
   onConfirm?: (value: string, e: any) => void;
 }
 
-export const InputDefaultProps: Partial<InputProps> = {};
-
-export const InputFunctionalProps: InputProps = {
+export const InputDefaultProps: InputProps = {
   type: null,
   value: null,
   defaultValue: null,

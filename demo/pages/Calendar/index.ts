@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 
 const localeText = {
   weekdayNames: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  title: 'YYYY/MM',
+  format: 'YYYY/MM',
   today: 'Today',
   start: 'Start',
   end: 'End',
@@ -31,6 +31,12 @@ function demo8Formatter(cell) {
   };
 }
 
+function demo8MonthFormatter(month) {
+  return {
+    ...month,
+  };
+}
+
 function demoFormatter(cell, value) {
   if (Array.isArray(value) && value.length == 1) {
     const current = value[0];
@@ -47,14 +53,15 @@ function demoFormatter(cell, value) {
   return {};
 }
 
+const nowDate = Date.now();
 Page({
   data: {
     demo1: {
-      defaultValue: [Date.now(), Date.now()],
+      defaultValue: [nowDate, nowDate],
       visible: true,
     },
     demo2: {
-      defaultValue: Date.now(),
+      defaultValue: dayjs().add(1, 'M').toDate().getTime(),
       visible: true,
     },
     demo3: {
@@ -79,16 +86,19 @@ Page({
     },
     demo8: {
       visible: true,
-      monthRange: [new Date().getTime(), new Date().getTime()],
+      monthRange: [
+        dayjs().toDate().getTime(),
+        dayjs().add(1, 'M').toDate().getTime(),
+      ],
     },
     /// #if WECHAT
     demoFormatter,
     demo8Formatter,
+    demo8MonthFormatter,
     /// #endif
     demo9: {
       visible: true,
-      value: Date.now(),
-      monthRange: [new Date().getTime(), new Date().getTime()],
+      value: nowDate,
     },
   },
   demo3NextMonth() {
@@ -111,6 +121,7 @@ Page({
   },
   demoFormatter,
   demo8Formatter,
+  demo8MonthFormatter,
   demo9HandleChange(value) {
     /// #if ALIPAY
     this.setData({
@@ -132,5 +143,16 @@ Page({
     this.setData({
       'demo9.value': this.data.demo9.value + 1000 * 24 * 3600,
     });
+  },
+  demo9HandleScrollIntoView() {
+    this.ref.scrollIntoView(dayjs().add(1, 'M').toDate().getTime());
+  },
+  handleRef(ref) {
+    /// #if ALIPAY
+    this.ref = ref;
+    /// #endif
+    /// #if WECHAT
+    this.ref = ref.detail;
+    /// #endif
   },
 });

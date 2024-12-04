@@ -35,6 +35,8 @@ export interface IActionSheetProps extends IBaseProps {
    */
   visible: boolean;
 
+  zIndex: number;
+
   /**
    * @description 点击选项时触发，禁用或加载状态下不会触发
    */
@@ -53,4 +55,6 @@ export const ActionSheetDefaultProps: Partial<IActionSheetProps> = {
   actions: [],
   cancelText: '取消',
   visible: false,
+  // 弹窗层级
+  zIndex: 998,
 };

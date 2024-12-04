@@ -30,6 +30,7 @@ export interface ICollapseProps extends IBaseProps {
     title?: string;
     content?: string;
     disabled?: boolean;
+    className?: string;
   }[];
 
   /**
@@ -39,9 +40,7 @@ export interface ICollapseProps extends IBaseProps {
   onChange?: (current: number[] | undefined, e: Record<string, any>) => void;
 }
 
-export const CollapseDefaultProps: ICollapseProps = {};
-
-export const CollapseFunctionalProps: ICollapseProps = {
+export const CollapseDefaultProps: ICollapseProps = {
   current: null,
   defaultCurrent: [],
   accordion: false,

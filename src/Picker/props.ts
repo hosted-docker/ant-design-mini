@@ -55,6 +55,11 @@ export interface IPickerProps extends IBaseProps {
    */
   placeholder: string;
   /**
+   * @description 空状态提示文案
+   * @default '暂无数据'
+   */
+  emptyText?: string;
+  /**
    * @description picker 数据
    */
   options: PickerValue[];
@@ -126,16 +131,6 @@ export interface IPickerProps extends IBaseProps {
 }
 
 export const PickerDefaultProps: Partial<IPickerProps> = {
-  okText: '确定',
-  cancelText: '取消',
-  disabled: false,
-  maskClosable: false,
-  options: [],
-  placeholder: '请选择',
-  defaultValue: [],
-};
-
-export const PickerFunctionalProps: Partial<IPickerProps> = {
   formattedValueText: null,
   visible: null,
   defaultVisible: null,
@@ -144,12 +139,13 @@ export const PickerFunctionalProps: Partial<IPickerProps> = {
   defaultValue: null,
   disabled: false,
   title: '',
-  okText: '确定',
-  cancelText: '取消',
-  placeholder: '请选择',
+  okText: null,
+  cancelText: null,
+  placeholder: null,
   options: [],
   popClassName: '',
   popStyle: '',
   maskClosable: true,
   onFormat: null,
+  emptyText: null,
 };

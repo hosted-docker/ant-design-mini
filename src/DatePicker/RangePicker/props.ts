@@ -5,6 +5,8 @@ export type PickerValue = [Date, Date];
  * @description 对话框
  */
 export interface IDateRangePickerProps extends IBaseProps {
+  visible?: boolean;
+  defaultVisible?: boolean;
   /**
    * @desciption  动画类型
    * @default "transform"
@@ -153,18 +155,8 @@ export interface IDateRangePickerProps extends IBaseProps {
 }
 
 export const DateRangePickerDefaultProps: Partial<IDateRangePickerProps> = {
-  okText: '确定',
-  cancelText: '取消',
-  maskClosable: true,
-  placeholder: '请选择',
-  format: 'YYYY/MM/DD',
-  splitCharacter: '-',
-  startPlaceholder: '未选择',
-  endPlaceholder: '未选择',
-  precision: 'day',
-};
-
-export const DateRangePickerFunctionalProps: Partial<IDateRangePickerProps> = {
+  visible: null,
+  defaultVisible: null,
   animationType: 'transform',
   format: 'YYYY/MM/DD',
   min: null,
@@ -172,16 +164,17 @@ export const DateRangePickerFunctionalProps: Partial<IDateRangePickerProps> = {
   value: null,
   defaultValue: null,
   title: '',
-  okText: '确定',
-  cancelText: '取消',
-  placeholder: '请选择',
+  okText: null,
+  cancelText: null,
+  placeholder: null,
   precision: 'day',
   splitCharacter: '-',
-  startPlaceholder: '未选择',
-  endPlaceholder: '未选择',
+  startPlaceholder: null,
+  endPlaceholder: null,
   maskClosable: true,
   popClassName: '',
   popStyle: '',
   disabled: false,
   onFormatLabel: null,
+  onFormat: null,
 };

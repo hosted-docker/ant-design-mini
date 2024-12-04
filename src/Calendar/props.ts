@@ -1,19 +1,11 @@
 import { IBaseProps } from '../_util/base';
+import { defaultMonthRange } from './utils';
 
 export interface CalendarDate {
   year: number;
   month: number;
   date: number;
 }
-
-export const defaultLocaleText = {
-  weekdayNames: ['一', '二', '三', '四', '五', '六', '日'],
-  title: 'YYYY年MM月',
-  today: '今日',
-  start: '开始',
-  end: '结束',
-  startAndEnd: '开始/结束',
-};
 
 export interface LocaleText {
   /**
@@ -22,9 +14,9 @@ export interface LocaleText {
    */
   weekdayNames: string[];
   /**
-   * 月份标题的格式。 默认为 'YYYY年MM月'
+   * 月份标题的格式。 除中文/英文外默认为'MM/YYYY',
    */
-  title: string;
+  format: string;
   /**
    * 今日的文案。 默认为 '今日'
    */
@@ -44,6 +36,10 @@ export interface LocaleText {
 }
 
 export interface CellState {
+  /**
+   * 类名
+   */
+  className?: string;
   /**
    * 是否被禁止
    */
@@ -82,6 +78,11 @@ export interface CellState {
   isRowBegin: boolean;
   isRowEnd: boolean;
   inThisMonth: boolean;
+  /**
+   * 是否在传入范围内
+   */
+  isRange: boolean;
+  index: number;
 }
 
 export type CalendarValue = number | number[];
@@ -111,9 +112,13 @@ export interface ICalendarProps extends IBaseProps {
    */
   weekStartsOn?: 'Sunday' | 'Monday';
   /**
-   * 国际化文案
+   * 选中值改变后滚动视图
    */
-  localeText?: Partial<LocaleText>;
+  changedScrollIntoView?: boolean;
+  /**
+   * 只展示在可选范围内的日期
+   */
+  showSelectableDatesOnly?: boolean;
   /**
    * 日期变化回调
    */
@@ -127,6 +132,7 @@ export interface ICalendarProps extends IBaseProps {
   onFormatter?: (
     cell: Pick<
       CellState,
+      | 'className'
       | 'disabled'
       | 'top'
       | 'bottom'
@@ -137,4 +143,23 @@ export interface ICalendarProps extends IBaseProps {
     >,
     currentValue: CalendarValue
   ) => Pick<CellState, 'disabled' | 'top' | 'bottom'>;
+  /**
+   * onMonthFormatter 用于设置月份的自定义数据
+   * @param month 原始数据
+   * @returns 返回新的数据
+   */
+  onMonthFormatter?: (month) => { title?: string; className?: string };
 }
+
+export const CalendarDefaultProps = {
+  defaultValue: null,
+  value: null,
+  selectionMode: 'range',
+  monthRange: defaultMonthRange(),
+  weekStartsOn: 'Sunday',
+  onFormatter: null,
+  onMonthFormatter: null,
+  changedScrollIntoView: null,
+  showSelectableDatesOnly: false,
+  onChange() {},
+};

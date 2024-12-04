@@ -1,17 +1,12 @@
 {
-  "data": {},
-  "deriveDataFromProps": [Function],
-  "didUnmount": [Function],
-  "lifetimes": {},
+  "data": undefined,
   "methods": {
     "catchTap": [Function],
     "onTap": [Function],
   },
-  "onInit": [Function],
-  "options": {
-    "lifetimes": true,
-  },
+  "mixins": [],
   "props": {
+    "arrow": false,
     "brief": "",
     "disabled": false,
     "extra": "",
@@ -20,5 +15,4 @@
     "showDivider": true,
     "title": "",
   },
-  "rootEvents": {},
 }

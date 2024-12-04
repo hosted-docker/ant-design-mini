@@ -1,6 +1,6 @@
-import { FormItemFunctionalProps, FormItemProps } from '../FormItem/props';
+import { FormItemDefaultProps, FormItemProps } from '../FormItem/props';
 import {
-  CheckboxGroupFunctionalProps,
+  CheckboxGroupDefaultProps,
   ICheckboxGroupProps,
 } from '../../Checkbox/CheckboxGroup/props';
 
@@ -11,9 +11,9 @@ export interface FormCheckboxGroupProps
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { position, ...rest } = CheckboxGroupFunctionalProps;
+const { position, ...rest } = CheckboxGroupDefaultProps;
 export const FormCheckboxGroupDefaultProps: Partial<FormCheckboxGroupProps> = {
-  ...FormItemFunctionalProps,
+  ...FormItemDefaultProps,
   ...rest,
   checkboxPosition: 'horizontal',
 };

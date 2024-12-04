@@ -1,7 +1,7 @@
-import { FormItemFunctionalProps, FormItemProps } from '../FormItem/props';
+import { FormItemDefaultProps, FormItemProps } from '../FormItem/props';
 import {
   IRadioGroupProps,
-  RadioGroupFunctionalProps,
+  RadioGroupDefaultProps,
 } from '../../Radio/RadioGroup/props';
 
 export interface FormRadioGroupProps
@@ -15,10 +15,10 @@ export interface FormRadioGroupProps
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { value, defaultValue, position, name, ...rest } =
-  RadioGroupFunctionalProps;
+RadioGroupDefaultProps;
 
 export const FormRadioGroupDefaultProps: Partial<FormRadioGroupProps> = {
-  ...FormItemFunctionalProps,
+  ...FormItemDefaultProps,
   ...rest,
   radioPosition: 'horizontal',
 };

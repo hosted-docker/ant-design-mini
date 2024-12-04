@@ -5,6 +5,8 @@ export type PickerValue = Date | string | number;
  * @description 对话框
  */
 export interface IDatePickerProps extends IBaseProps {
+  visible?: boolean;
+  defaultVisible?: boolean;
   /**
    * @desciption  动画类型
    * @default "transform"
@@ -136,15 +138,8 @@ export interface IDatePickerProps extends IBaseProps {
 }
 
 export const DatePickerDefaultProps: IDatePickerProps = {
-  okText: '确定',
-  cancelText: '取消',
-  maskClosable: true,
-  placeholder: '请选择',
-  format: 'YYYY/MM/DD',
-  precision: 'day',
-};
-
-export const DatePickerFunctionalProps: IDatePickerProps = {
+  visible: null,
+  defaultVisible: null,
   animationType: 'transform',
   format: 'YYYY/MM/DD',
   min: null,
@@ -152,13 +147,14 @@ export const DatePickerFunctionalProps: IDatePickerProps = {
   value: null,
   defaultValue: null,
   title: '',
-  okText: '确定',
-  cancelText: '取消',
-  placeholder: '请选择',
+  okText: undefined,
+  cancelText: undefined,
+  placeholder: undefined,
   precision: 'day',
   maskClosable: true,
   popClassName: '',
   popStyle: '',
   disabled: false,
   onFormatLabel: null,
+  onFormat: null,
 };
